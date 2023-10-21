@@ -31,11 +31,9 @@ export default class UserFlux {
     }
 
     static #trackPageView() {
-        const pageUrl = window.location.href;
-        const pageTitle = document.title;
         UserFlux.track('page_view', {
-            url: pageUrl,
-            title: pageTitle,
+            url: window.location.href,
+            title: document.title,
             referrer: document.referrer,
             referrerDomain: document.referrer ? new URL(document.referrer).hostname : null,
             path: window.location.pathname
@@ -63,7 +61,7 @@ export default class UserFlux {
     static startFlushInterval() {
         setInterval(() => {
             UserFlux.checkQueue(UserFlux.trackQueue, 'event/ingest/batch', true);
-        }, 3000);
+        }, 5000);
     }
 
     static identify(attributes) {
@@ -87,6 +85,7 @@ export default class UserFlux {
         }
 
         const payload = {
+            timestamp: Date.now(),
             userId: null,
             anonymousId: UserFlux.anonymousId,
             name: name,
