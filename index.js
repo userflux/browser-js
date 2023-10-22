@@ -1,6 +1,7 @@
 export default class UserFlux {
 
     static apiKey = null;
+    static userId = null;
     static trackQueue = UserFlux.loadEventsFromStorage('uf-track') || [];
     static anonymousId = UserFlux.getOrCreateAnonymousId();
 
@@ -64,13 +65,48 @@ export default class UserFlux {
         }, 5000);
     }
 
+    static identify(userId) {
+        if (!UserFlux.isApiKeyProvided()) {
+            console.error('API key not provided. Cannot identify user.');
+            return;
+        }
+
+        UserFlux.userId = userId;
+
+        const payload = {
+            userId: userId,
+            anonymousId: UserFlux.anonymousId,
+            properties: {}
+        };
+
+        sendRequest('profile', payload)
+    }
+
     static identify(attributes) {
         if (!UserFlux.isApiKeyProvided()) {
             console.error('API key not provided. Cannot identify user.');
             return;
         }
+
         const payload = {
-            userId: null,
+            userId: UserFlux.userId,
+            anonymousId: UserFlux.anonymousId,
+            properties: attributes
+        };
+        
+        sendRequest('profile', payload)
+    }
+
+    static identify(userId, attributes) {
+        if (!UserFlux.isApiKeyProvided()) {
+            console.error('API key not provided. Cannot identify user.');
+            return;
+        }
+
+        UserFlux.userId = userId;
+
+        const payload = {
+            userId: userId,
             anonymousId: UserFlux.anonymousId,
             properties: attributes
         };
@@ -86,7 +122,7 @@ export default class UserFlux {
 
         const payload = {
             timestamp: Date.now(),
-            userId: null,
+            userId: UserFlux.userId,
             anonymousId: UserFlux.anonymousId,
             name: name,
             properties: properties
