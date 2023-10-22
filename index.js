@@ -78,39 +78,7 @@ export default class UserFlux {
         }, 5000);
     }
 
-    static identify(userId) {
-        if (!UserFlux.isApiKeyProvided()) {
-            console.error('API key not provided. Cannot identify user.');
-            return;
-        }
-
-        UserFlux.setUserId(userId);
-
-        const payload = {
-            userId: userId,
-            anonymousId: UserFlux.ufAnonymousId,
-            properties: {}
-        };
-
-        sendRequest('profile', payload)
-    }
-
-    static identify(attributes) {
-        if (!UserFlux.isApiKeyProvided()) {
-            console.error('API key not provided. Cannot identify user.');
-            return;
-        }
-
-        const payload = {
-            userId: UserFlux.ufUserId,
-            anonymousId: UserFlux.ufAnonymousId,
-            properties: attributes
-        };
-        
-        sendRequest('profile', payload)
-    }
-
-    static identify(userId, attributes) {
+    static identify(userId = UserFlux.ufUserId, attributes = {}) {
         if (!UserFlux.isApiKeyProvided()) {
             console.error('API key not provided. Cannot identify user.');
             return;
@@ -123,7 +91,7 @@ export default class UserFlux {
             anonymousId: UserFlux.ufAnonymousId,
             properties: attributes
         };
-        
+
         sendRequest('profile', payload)
     }
 
