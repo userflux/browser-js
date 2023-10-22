@@ -21,11 +21,11 @@ export default class UserFlux {
         // Override pushState to track page views
         history.pushState = function() {
             originalPushState.apply(this, arguments);
-            UserFlux.trackPageView();
+            UserFlux.#trackPageView();
         };
 
         // Track page views on popstate (back/forward navigation)
-        window.addEventListener('popstate', UserFlux.trackPageView);
+        window.addEventListener('popstate', UserFlux.#trackPageView);
 
         // Track initial page view
         UserFlux.#trackPageView();
