@@ -74,7 +74,7 @@ export default class UserFlux {
 
     static startFlushInterval() {
         setInterval(() => {
-            UserFlux.checkQueue(UserFlux.trackQueue, 'event/ingest/batch', true);
+            UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', true);
         }, 5000);
     }
 
@@ -141,9 +141,9 @@ export default class UserFlux {
             properties: properties
         };
 
-        UserFlux.trackQueue.push(payload);
-        UserFlux.saveEventsToStorage('uf-track', UserFlux.trackQueue);
-        UserFlux.checkQueue(UserFlux.trackQueue, 'event/ingest/batch', false);
+        UserFlux.ufTrackQueue.push(payload);
+        UserFlux.saveEventsToStorage('uf-track', UserFlux.ufTrackQueue);
+        UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', false);
     }
 
     static saveEventsToStorage(key, queue) {
