@@ -7,5 +7,6 @@ declare module '@userflux/analytics-js' {
         static identify(attributes: object): void;
         static identify(userId: string, attributes: object): void;
         static track(name: string, properties: object): void;
+        static reset(): void;
     }
 }

@@ -1,12 +1,12 @@
 export default class UserFlux {
 
-    static apiKey = null;
-    static userId = null;
-    static trackQueue = UserFlux.loadEventsFromStorage('uf-track') || [];
-    static anonymousId = UserFlux.getOrCreateAnonymousId();
+    static ufApiKey = null;
+    static ufUserId = UserFlux.getUserId() || null;
+    static ufTrackQueue = UserFlux.loadEventsFromStorage('uf-track') || [];
+    static ufAnonymousId = UserFlux.getOrCreateAnonymousId();
 
     static initialize(apiKey, options = {}) {
-        UserFlux.apiKey = apiKey;
+        UserFlux.ufApiKey = apiKey;
         UserFlux.startFlushInterval();
 
         if (options.autoPageTracking) {
@@ -42,7 +42,7 @@ export default class UserFlux {
     }
 
     static isApiKeyProvided() {
-        return UserFlux.apiKey !== null;
+        return UserFlux.ufApiKey !== null;
     }
 
     static getOrCreateAnonymousId() {
@@ -54,9 +54,22 @@ export default class UserFlux {
         return anonymousId;
     }
 
+    static getUserId() {
+        return localStorage.getItem('uf-userId');
+    }
+
+    static setUserId(userId) {
+        UserFlux.ufUserId = userId;
+        localStorage.setItem('uf-userId', userId);
+    }
+
     static loadEventsFromStorage(key) {
         const events = localStorage.getItem(key);
         return events ? JSON.parse(events) : [];
+    }
+
+    static reset() {
+        localStorage.removeItem('uf-userId');
     }
 
     static startFlushInterval() {
@@ -71,11 +84,11 @@ export default class UserFlux {
             return;
         }
 
-        UserFlux.userId = userId;
+        UserFlux.setUserId(userId);
 
         const payload = {
             userId: userId,
-            anonymousId: UserFlux.anonymousId,
+            anonymousId: UserFlux.ufAnonymousId,
             properties: {}
         };
 
@@ -89,8 +102,8 @@ export default class UserFlux {
         }
 
         const payload = {
-            userId: UserFlux.userId,
-            anonymousId: UserFlux.anonymousId,
+            userId: UserFlux.ufUserId,
+            anonymousId: UserFlux.ufAnonymousId,
             properties: attributes
         };
         
@@ -103,11 +116,11 @@ export default class UserFlux {
             return;
         }
 
-        UserFlux.userId = userId;
+        UserFlux.setUserId(userId);
 
         const payload = {
             userId: userId,
-            anonymousId: UserFlux.anonymousId,
+            anonymousId: UserFlux.ufAnonymousId,
             properties: attributes
         };
         
@@ -122,8 +135,8 @@ export default class UserFlux {
 
         const payload = {
             timestamp: Date.now(),
-            userId: UserFlux.userId,
-            anonymousId: UserFlux.anonymousId,
+            userId: UserFlux.ufUserId,
+            anonymousId: UserFlux.ufAnonymousId,
             name: name,
             properties: properties
         };
@@ -163,7 +176,7 @@ export default class UserFlux {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${UserFlux.apiKey}`
+                'Authorization': `Bearer ${UserFlux.ufApiKey}`
             },
             body: JSON.stringify(data)
         })
