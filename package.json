@@ -1,6 +1,6 @@
 {
   "name": "@userflux/analytics-js",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "UserFlux's JavaScript SDK - send your frontend analytics data to the UserFlux platform",
   "main": "index.js",
   "types": "index.d.ts",
@@ -14,8 +14,7 @@
   "keywords": [
     "userflux",
     "sdk",
-    "js",
-    "analytics"
+    "js"
   ],
   "author": "UserFlux",
   "license": "ISC",
