@@ -5,11 +5,11 @@ export default class UserFlux {
     static ufTrackQueue = UserFlux.loadEventsFromStorage('uf-track') || [];
     static ufAnonymousId = UserFlux.getOrCreateAnonymousId();
 
-    static initialize(apiKey, options = {}) {
+    static initialize(apiKey, options) {
         UserFlux.ufApiKey = apiKey;
         UserFlux.startFlushInterval();
 
-        if (options.autoPageTracking) {
+        if (options['autoPageTracking'] && options['autoPageTracking'] == true) {
             UserFlux.setupPageViewListener();
         }
     }
@@ -78,7 +78,7 @@ export default class UserFlux {
         }, 5000);
     }
 
-    static identify(userId = UserFlux.ufUserId, attributes = {}) {
+    static identify(attributes, userId = UserFlux.ufUserId) {
         if (!UserFlux.isApiKeyProvided()) {
             console.error('API key not provided. Cannot identify user.');
             return;
@@ -92,7 +92,7 @@ export default class UserFlux {
             properties: attributes
         };
 
-        sendRequest('profile', payload)
+        UserFlux.sendRequest('profile', payload)
     }
 
     static track(name, properties) {
@@ -146,7 +146,8 @@ export default class UserFlux {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${UserFlux.ufApiKey}`
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
+            keepalive: true
         })
         .then(response => {})
         .catch((error) => console.error('Error:', error));
