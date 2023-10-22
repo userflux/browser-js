@@ -9,7 +9,7 @@ export default class UserFlux {
         UserFlux.ufApiKey = apiKey;
         UserFlux.startFlushInterval();
 
-        if (options['autoPageTracking'] && options['autoPageTracking'] == true) {
+        if (options['autoCapturePageViews'] && options['autoCapturePageViews'] == true) {
             UserFlux.setupPageViewListener();
         }
     }
@@ -33,7 +33,6 @@ export default class UserFlux {
 
     static #trackPageView() {
         UserFlux.track('page_view', {
-            url: window.location.href,
             title: document.title,
             referrer: document.referrer,
             referrerDomain: document.referrer ? new URL(document.referrer).hostname : null,
@@ -48,7 +47,7 @@ export default class UserFlux {
     static getOrCreateAnonymousId() {
         let anonymousId = localStorage.getItem('uf-anonymousId');
         if (!anonymousId) {
-            anonymousId = 'uf-' + crypto.randomUUID();
+            anonymousId = crypto.randomUUID();
             localStorage.setItem('uf-anonymousId', anonymousId);
         }
         return anonymousId;
@@ -95,15 +94,17 @@ export default class UserFlux {
         UserFlux.sendRequest('profile', payload)
     }
 
-    static track(name, properties) {
+    static track(name, properties, userId = UserFlux.ufUserId) {
         if (!UserFlux.isApiKeyProvided()) {
             console.error('API key not provided. Cannot track event.');
             return;
         }
 
+        UserFlux.setUserId(userId);
+
         const payload = {
             timestamp: Date.now(),
-            userId: UserFlux.ufUserId,
+            userId: userId,
             anonymousId: UserFlux.ufAnonymousId,
             name: name,
             properties: properties
