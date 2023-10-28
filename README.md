@@ -10,8 +10,18 @@ npm i @userflux/browser-js
 2. Import the package and initialise the SDK
 ```
 import UserFlux from '@userflux/browser-js'
-
 UserFlux.initialize('<YOUR_WRITE_KEY>', { autoCapturePageViews: true })
+```
+
+Alternatively install without using a package manager
+```
+<head>
+    ...
+    <script type="module">
+    import UserFlux from 'https://cdn.jsdelivr.net/npm/@userflux/browser-js@1.0.25/+esm'
+    UserFlux.initialize('<YOUR_WRITE_KEY>', { autoCapturePageViews: true })
+    </script>
+</head>
 ```
 
 3. Tracking events
