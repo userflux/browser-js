@@ -1,15 +1,15 @@
-# @userflux/browser-analytics-js
+# @userflux/browser-js
 UserFlux's Browser JavaScript SDK - send your frontend analytics data to the UserFlux platform.
 
 # Getting Started
 1. Install the package
 ```
-npm i @userflux/browser-analytics-js
+npm i @userflux/browser-js
 ```
 
 2. Import the package and initialise the SDK
 ```
-import UserFlux from '@userflux/browser-analytics-js'
+import UserFlux from '@userflux/browser-js'
 
 UserFlux.initialize('<YOUR_WRITE_KEY>', { autoCapturePageViews: true })
 ```

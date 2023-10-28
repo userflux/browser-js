@@ -1,4 +1,4 @@
-export default class UserFlux {
+class UserFlux {
 
     static ufApiKey = null;
     static ufUserId = UserFlux.getUserId() || null;
@@ -155,3 +155,5 @@ export default class UserFlux {
     }
 
 }
+
+export { UserFlux as default, UserFlux };
