@@ -1,6 +1,6 @@
 {
   "name": "@userflux/browser-js",
-  "version": "1.0.23",
+  "version": "1.0.24",
   "description": "UserFlux's JavaScript SDK - send your frontend analytics data to the UserFlux platform",
   "main": "index.js",
   "types": "index.d.ts",
