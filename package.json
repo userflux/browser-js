@@ -1,6 +1,6 @@
 {
   "name": "@userflux/browser-js",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "description": "UserFlux's JavaScript SDK - send your frontend analytics data to the UserFlux platform",
   "main": "index.js",
   "types": "index.d.ts",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/userflux/browser-analytics-js.git"
+    "url": "git+https://github.com/userflux/browser-js.git"
   },
   "keywords": [
     "userflux",
@@ -21,7 +21,7 @@
   "author": "UserFlux",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/userflux/browser-analytics-js/issues"
+    "url": "https://github.com/userflux/browser-js/issues"
   },
-  "homepage": "https://github.com/userflux/browser-analytics-js#readme"
+  "homepage": "https://github.com/userflux/browser-js#readme"
 }
