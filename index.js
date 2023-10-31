@@ -1,3 +1,5 @@
+const fetch = require('cross-fetch');
+
 class UserFlux {
 
     static ufApiKey = null;
@@ -9,7 +11,7 @@ class UserFlux {
         UserFlux.ufApiKey = apiKey;
         UserFlux.startFlushInterval();
 
-        if (options['autoCapturePageViews'] && options['autoCapturePageViews'] == true) {
+        if (options['autoCapturePageViews'] && options['autoCapturePageViews'] == true && typeof window !== 'undefined') {
             UserFlux.setupPageViewListener();
         }
     }

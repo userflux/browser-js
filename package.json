@@ -1,6 +1,6 @@
 {
   "name": "@userflux/browser-js",
-  "version": "1.0.32",
+  "version": "1.0.35",
   "description": "UserFlux's JavaScript SDK - send your frontend analytics data to the UserFlux platform",
   "main": "index.js",
   "types": "index.d.ts",
@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/userflux/browser-js/issues"
   },
-  "homepage": "https://github.com/userflux/browser-js#readme"
+  "homepage": "https://github.com/userflux/browser-js#readme",
+  "dependencies": {
+    "cross-fetch": "^4.0.0"
+  }
 }
