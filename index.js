@@ -5,8 +5,6 @@ class UserFlux {
     static ufTrackQueue = UserFlux.loadEventsFromStorage('uf-track') || [];
     static ufAnonymousId = UserFlux.getOrCreateAnonymousId();
 
-    static storage = null;
-
     static initialize(apiKey, options) {
         UserFlux.ufApiKey = apiKey;
         UserFlux.startFlushInterval();
@@ -14,12 +12,13 @@ class UserFlux {
         if (options['autoCapturePageViews'] && options['autoCapturePageViews'] == true) {
             UserFlux.setupPageViewListener();
         }
+    }
 
+    static getStorage() {
         if (typeof window !== 'undefined') {
-            UserFlux.storage = window.localStorage;
+            return localStorage;
         } else {
-            // Fallback to a server-side storage solution
-            // UserFlux.storage = /* your server-side storage solution */
+            return null;
         }
     }
 
@@ -54,10 +53,10 @@ class UserFlux {
     }
 
     static getOrCreateAnonymousId() {
-        let anonymousId = UserFlux.storage?.getItem('uf-anonymousId');
+        let anonymousId = UserFlux.getStorage()?.getItem('uf-anonymousId');
         if (!anonymousId) {
             anonymousId = UserFlux.generateUUID();
-            UserFlux.storage?.setItem('uf-anonymousId', anonymousId);
+            UserFlux.getStorage()?.setItem('uf-anonymousId', anonymousId);
         }
         return anonymousId;
     }
@@ -71,21 +70,21 @@ class UserFlux {
     }
 
     static getUserId() {
-        return UserFlux.storage?.getItem('uf-userId');
+        return UserFlux.getStorage()?.getItem('uf-userId');
     }
 
     static setUserId(userId) {
         UserFlux.ufUserId = userId;
-        UserFlux.storage?.setItem('uf-userId', userId);
+        UserFlux.getStorage()?.setItem('uf-userId', userId);
     }
 
     static loadEventsFromStorage(key) {
-        const events = UserFlux.storage?.getItem(key);
+        const events = UserFlux.getStorage()?.getItem(key);
         return events ? JSON.parse(events) : [];
     }
 
     static reset() {
-        UserFlux.storage?.removeItem('uf-userId');
+        UserFlux.getStorage()?.removeItem('uf-userId');
     }
 
     static startFlushInterval() {
@@ -133,7 +132,7 @@ class UserFlux {
     }
 
     static saveEventsToStorage(key, queue) {
-        UserFlux.storage?.setItem(key, JSON.stringify(queue));
+        UserFlux.getStorage()?.setItem(key, JSON.stringify(queue));
     }
 
     static checkQueue(queue, eventType, forceFlush) {

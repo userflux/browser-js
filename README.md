@@ -18,7 +18,7 @@ Alternatively install without using a package manager
 <head>
     ...
     <script type="module">
-    import UserFlux from 'https://cdn.jsdelivr.net/npm/@userflux/browser-js@1.0.25/+esm'
+    import UserFlux from 'https://cdn.skypack.dev/@userflux/browser-js@1.0.32'
     UserFlux.initialize('<YOUR_WRITE_KEY>', { autoCapturePageViews: true })
     </script>
 </head>
