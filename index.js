@@ -101,6 +101,7 @@ class UserFlux {
             return;
         }
 
+        if (userId == 'null') userId = null;
         UserFlux.setUserId(userId);
 
         const payload = {
@@ -118,6 +119,7 @@ class UserFlux {
             return;
         }
 
+        if (userId == 'null') userId = null;
         UserFlux.setUserId(userId);
 
         const payload = {
