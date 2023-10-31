@@ -5,12 +5,21 @@ class UserFlux {
     static ufTrackQueue = UserFlux.loadEventsFromStorage('uf-track') || [];
     static ufAnonymousId = UserFlux.getOrCreateAnonymousId();
 
+    static storage = null;
+
     static initialize(apiKey, options) {
         UserFlux.ufApiKey = apiKey;
         UserFlux.startFlushInterval();
 
         if (options['autoCapturePageViews'] && options['autoCapturePageViews'] == true) {
             UserFlux.setupPageViewListener();
+        }
+
+        if (typeof window !== 'undefined') {
+            UserFlux.storage = window.localStorage;
+        } else {
+            // Fallback to a server-side storage solution
+            // UserFlux.storage = /* your server-side storage solution */
         }
     }
 
@@ -45,30 +54,30 @@ class UserFlux {
     }
 
     static getOrCreateAnonymousId() {
-        let anonymousId = localStorage.getItem('uf-anonymousId');
+        let anonymousId = UserFlux.storage?.getItem('uf-anonymousId');
         if (!anonymousId) {
             anonymousId = crypto.randomUUID();
-            localStorage.setItem('uf-anonymousId', anonymousId);
+            UserFlux.storage?.setItem('uf-anonymousId', anonymousId);
         }
         return anonymousId;
     }
 
     static getUserId() {
-        return localStorage.getItem('uf-userId');
+        return UserFlux.storage?.getItem('uf-userId');
     }
 
     static setUserId(userId) {
         UserFlux.ufUserId = userId;
-        localStorage.setItem('uf-userId', userId);
+        UserFlux.storage?.setItem('uf-userId', userId);
     }
 
     static loadEventsFromStorage(key) {
-        const events = localStorage.getItem(key);
+        const events = UserFlux.storage?.getItem(key);
         return events ? JSON.parse(events) : [];
     }
 
     static reset() {
-        localStorage.removeItem('uf-userId');
+        UserFlux.storage?.removeItem('uf-userId');
     }
 
     static startFlushInterval() {
@@ -116,7 +125,7 @@ class UserFlux {
     }
 
     static saveEventsToStorage(key, queue) {
-        localStorage.setItem(key, JSON.stringify(queue));
+        UserFlux.storage?.setItem(key, JSON.stringify(queue));
     }
 
     static checkQueue(queue, eventType, forceFlush) {
@@ -156,4 +165,4 @@ class UserFlux {
 
 }
 
-export { UserFlux as default, UserFlux };
+module.exports = UserFlux;
