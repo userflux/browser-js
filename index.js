@@ -263,13 +263,13 @@ class UserFlux {
         // Extract query parameters
         const urlSearchParams = new URLSearchParams(new URL(locationHref).search);
         let queryParams = {
-            utm_source: urlSearchParams.get('utm_source') || null,
-            utm_medium: urlSearchParams.get('utm_medium') || null,
-            utm_campaign: urlSearchParams.get('utm_campaign') || null,
-            utm_term: urlSearchParams.get('utm_term') || null,
-            utm_content: urlSearchParams.get('utm_content') || null,
-            utm_id: urlSearchParams.get('utm_id') || null,
-            utm_source_platform: urlSearchParams.get('utm_source_platform') || null
+            utmSource: urlSearchParams.get('utm_source') || null,
+            utmMedium: urlSearchParams.get('utm_medium') || null,
+            utmCampaign: urlSearchParams.get('utm_campaign') || null,
+            utmTerm: urlSearchParams.get('utm_term') || null,
+            utmContent: urlSearchParams.get('utm_content') || null,
+            utmId: urlSearchParams.get('utm_id') || null,
+            utmSourcePlatform: urlSearchParams.get('utm_source_platform') || null
         };
 
         return queryParams;
