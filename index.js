@@ -87,9 +87,12 @@ class UserFlux {
     }
 
     static reset() {
+        // Firstly, flush any pending events
+        UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', true);
+
+        // Clear all stored data
         UserFlux.getStorage()?.removeItem('uf-userId');
-        // TODO: remove anon id?
-        // TODO: flush?
+        UserFlux.getStorage()?.removeItem('uf-anonymousId');
     }
 
     static startFlushInterval() {
@@ -98,6 +101,7 @@ class UserFlux {
         }, 5000);
     }
 
+    // TODO: make async
     static identify(attributes, userId = UserFlux.ufUserId) {
         if (!UserFlux.isApiKeyProvided()) {
             console.error('API key not provided. Cannot identify user.');
@@ -111,7 +115,8 @@ class UserFlux {
         const payload = {
             userId: userId,
             anonymousId: UserFlux.ufAnonymousId,
-            properties: attributes
+            properties: attributes,
+            deviceData: UserFlux.getDeviceProperties()
         };
 
         UserFlux.sendRequest('profile', payload)
@@ -132,7 +137,8 @@ class UserFlux {
             userId: userId,
             anonymousId: UserFlux.ufAnonymousId,
             name: name,
-            properties: properties
+            properties: properties,
+            deviceData: UserFlux.getDeviceProperties()
         };
 
         UserFlux.ufTrackQueue.push(payload);
@@ -179,6 +185,68 @@ class UserFlux {
         })
         .then(response => {})
         .catch((error) => console.error('Error:', error));
+    }
+
+    static getDeviceProperties() {
+        // Check if running in a browser environment
+        if (typeof window === 'undefined') {
+            return null;
+        }
+
+        const userAgent = window.navigator.userAgent;
+        let browser, browserVersion, deviceType, os;
+
+        // Determine Browser and Browser Version
+        if (userAgent.indexOf('Chrome') > -1) {
+            browser = 'Chrome';
+            browserVersion = userAgent.match(/Chrome\/(\d+)/)[1];
+        } else if (userAgent.indexOf('Safari') > -1) {
+            browser = 'Safari';
+            browserVersion = userAgent.match(/Version\/([\d.]+)/)[1];
+        } else if (userAgent.indexOf('Firefox') > -1) {
+            browser = 'Firefox';
+            browserVersion = userAgent.match(/Firefox\/([\d.]+)/)[1];
+        } else if (userAgent.indexOf('MSIE') > -1 || userAgent.indexOf('Trident') > -1) {
+            browser = 'Internet Explorer';
+            browserVersion = userAgent.match(/(?:MSIE |rv:)(\d+)/)[1];
+        } else {
+            browser = 'Unknown';
+            browserVersion = 'Unknown';
+        }
+
+        // Determine Device Type
+        if (/Mobi|Android/i.test(userAgent)) {
+            deviceType = 'Mobile';
+        } else {
+            deviceType = 'Desktop';
+        }
+
+        // Determine OS
+        if (userAgent.indexOf('Mac OS X') > -1) {
+            os = 'Mac OS X';
+        } else if (userAgent.indexOf('Windows NT') > -1) {
+            os = 'Windows';
+        } else if (userAgent.indexOf('Linux') > -1) {
+            os = 'Linux';
+        } else if (/iPhone|iPad|iPod/i.test(userAgent)) {
+            os = 'iOS';
+        } else if (userAgent.indexOf('Android') > -1) {
+            os = 'Android';
+        } else {
+            os = 'Unknown';
+        }
+
+        return {
+            userAgent: userAgent,
+            browser: browser,
+            browserVersion: browserVersion,
+            deviceType: deviceType,
+            os: os,
+            screenWidth: window.screen.width,
+            screenHeight: window.screen.height,
+            browserWidth: window.innerWidth,
+            browserHeight: window.innerHeight
+        };
     }
 
 }
