@@ -191,88 +191,106 @@ class UserFlux {
     }
 
     static getDeviceProperties() {
-        // Check if running in a browser environment
-        if (typeof window === 'undefined') {
+        try {
+            // Check if running in a browser environment
+            if (typeof window === 'undefined') {
+                return null;
+            }
+
+            const userAgent = window.navigator.userAgent;
+            let browser, browserVersion, deviceType, os;
+
+            // Determine Browser and Browser Version
+            if (userAgent.indexOf('Chrome') > -1) {
+                browser = 'Chrome';
+                const match = userAgent.match(/Chrome\/(\d+)/);
+                browserVersion = match ? match[1] : 'Unknown';
+            } else if (userAgent.indexOf('CriOS') > -1) {
+                browser = 'Chrome';
+                const match = userAgent.match(/CriOS\/([\d.]+)/);
+                browserVersion = match ? match[1] : 'Unknown';
+            } else if (userAgent.indexOf('Safari') > -1) {
+                browser = 'Safari';
+                const match = userAgent.match(/Version\/([\d.]+)/);
+                browserVersion = match ? match[1] : 'Unknown';
+            } else if (userAgent.indexOf('Firefox') > -1) {
+                browser = 'Firefox';
+                const match = userAgent.match(/Firefox\/([\d.]+)/);
+                browserVersion = match ? match[1] : 'Unknown';
+            } else if (userAgent.indexOf('MSIE') > -1 || userAgent.indexOf('Trident') > -1) {
+                browser = 'Internet Explorer';
+                const match = userAgent.match(/(?:MSIE |rv:)(\d+)/);
+                browserVersion = match ? match[1] : 'Unknown';
+            } else {
+                browser = 'Unknown';
+                browserVersion = 'Unknown';
+            }
+
+            // Determine Device Type
+            if (/Mobi|Android/i.test(userAgent)) {
+                deviceType = 'Mobile';
+            } else {
+                deviceType = 'Desktop';
+            }
+
+            // Determine OS
+            if (userAgent.indexOf('Mac OS X') > -1) {
+                os = 'Mac OS X';
+            } else if (userAgent.indexOf('Windows NT') > -1) {
+                os = 'Windows';
+            } else if (userAgent.indexOf('Linux') > -1) {
+                os = 'Linux';
+            } else if (/iPhone|iPad|iPod/i.test(userAgent)) {
+                os = 'iOS';
+            } else if (userAgent.indexOf('Android') > -1) {
+                os = 'Android';
+            } else {
+                os = 'Unknown';
+            }
+
+            return {
+                userAgent: userAgent,
+                browser: browser,
+                browserVersion: browserVersion,
+                deviceType: deviceType,
+                os: os,
+                screenWidth: window.screen.width,
+                screenHeight: window.screen.height,
+                browserWidth: window.innerWidth,
+                browserHeight: window.innerHeight
+            };
+        } catch (e) {
+            console.error('Error:', error)
             return null;
         }
-
-        const userAgent = window.navigator.userAgent;
-        let browser, browserVersion, deviceType, os;
-
-        // Determine Browser and Browser Version
-        if (userAgent.indexOf('Chrome') > -1) {
-            browser = 'Chrome';
-            browserVersion = userAgent.match(/Chrome\/(\d+)/)[1];
-        } else if (userAgent.indexOf('Safari') > -1) {
-            browser = 'Safari';
-            browserVersion = userAgent.match(/Version\/([\d.]+)/)[1];
-        } else if (userAgent.indexOf('Firefox') > -1) {
-            browser = 'Firefox';
-            browserVersion = userAgent.match(/Firefox\/([\d.]+)/)[1];
-        } else if (userAgent.indexOf('MSIE') > -1 || userAgent.indexOf('Trident') > -1) {
-            browser = 'Internet Explorer';
-            browserVersion = userAgent.match(/(?:MSIE |rv:)(\d+)/)[1];
-        } else {
-            browser = 'Unknown';
-            browserVersion = 'Unknown';
-        }
-
-        // Determine Device Type
-        if (/Mobi|Android/i.test(userAgent)) {
-            deviceType = 'Mobile';
-        } else {
-            deviceType = 'Desktop';
-        }
-
-        // Determine OS
-        if (userAgent.indexOf('Mac OS X') > -1) {
-            os = 'Mac OS X';
-        } else if (userAgent.indexOf('Windows NT') > -1) {
-            os = 'Windows';
-        } else if (userAgent.indexOf('Linux') > -1) {
-            os = 'Linux';
-        } else if (/iPhone|iPad|iPod/i.test(userAgent)) {
-            os = 'iOS';
-        } else if (userAgent.indexOf('Android') > -1) {
-            os = 'Android';
-        } else {
-            os = 'Unknown';
-        }
-
-        return {
-            userAgent: userAgent,
-            browser: browser,
-            browserVersion: browserVersion,
-            deviceType: deviceType,
-            os: os,
-            screenWidth: window.screen.width,
-            screenHeight: window.screen.height,
-            browserWidth: window.innerWidth,
-            browserHeight: window.innerHeight
-        };
     }
 
     static getUTMProperties() {
-        // Check if running in a browser environment
-        if (typeof window === 'undefined') {
+        try {
+            // Check if running in a browser environment
+            if (typeof window === 'undefined') {
+                return null;
+            }
+
+            let locationHref = window.location.href;
+
+            // Extract query parameters
+            const urlSearchParams = new URLSearchParams(new URL(locationHref).search);
+            let queryParams = {
+                utmSource: urlSearchParams.get('utm_source') || null,
+                utmMedium: urlSearchParams.get('utm_medium') || null,
+                utmCampaign: urlSearchParams.get('utm_campaign') || null,
+                utmTerm: urlSearchParams.get('utm_term') || null,
+                utmContent: urlSearchParams.get('utm_content') || null,
+                utmId: urlSearchParams.get('utm_id') || null,
+                utmSourcePlatform: urlSearchParams.get('utm_source_platform') || null
+            };
+
+            return queryParams;
+        } catch (e) {
+            console.error('Error:', error)
             return null;
         }
-
-        let locationHref = window.location.href;
-
-        // Extract query parameters
-        const urlSearchParams = new URLSearchParams(new URL(locationHref).search);
-        let queryParams = {
-            utmSource: urlSearchParams.get('utm_source') || null,
-            utmMedium: urlSearchParams.get('utm_medium') || null,
-            utmCampaign: urlSearchParams.get('utm_campaign') || null,
-            utmTerm: urlSearchParams.get('utm_term') || null,
-            utmContent: urlSearchParams.get('utm_content') || null,
-            utmId: urlSearchParams.get('utm_id') || null,
-            utmSourcePlatform: urlSearchParams.get('utm_source_platform') || null
-        };
-
-        return queryParams;
     }
 
 }
