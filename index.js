@@ -42,12 +42,14 @@ class UserFlux {
     }
 
     static trackPageView() {
-        // TODO: clean up page view properties + add query parameters
+        const utmProperties = UserFlux.getUTMProperties() || {};
+
         UserFlux.track('page_view', {
             title: document.title,
             referrer: document.referrer,
             referrerDomain: document.referrer ? new URL(document.referrer).hostname : null,
-            path: window.location.pathname
+            path: window.location.pathname,
+            ...utmProperties
         });
     }
 
@@ -111,7 +113,6 @@ class UserFlux {
         if (userId == 'null') userId = null;
         UserFlux.setUserId(userId);
 
-        // TODO: enrich with device properties
         const payload = {
             userId: userId,
             anonymousId: UserFlux.ufAnonymousId,
@@ -131,7 +132,6 @@ class UserFlux {
         if (userId == 'null') userId = null;
         UserFlux.setUserId(userId);
 
-        // TODO: enrich with device properties
         const payload = {
             timestamp: Date.now(),
             userId: userId,
@@ -143,11 +143,12 @@ class UserFlux {
 
         UserFlux.ufTrackQueue.push(payload);
         UserFlux.saveEventsToStorage('uf-track', UserFlux.ufTrackQueue);
-        UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', false);
+        
+        const shouldForceFlush = (UserFlux.getStorage() == null);
+        UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', shouldForceFlush);
     }
 
     static saveEventsToStorage(key, queue) {
-        // TODO: auto flush if storage doesn't exist
         UserFlux.getStorage()?.setItem(key, JSON.stringify(queue));
     }
 
@@ -247,6 +248,29 @@ class UserFlux {
             browserWidth: window.innerWidth,
             browserHeight: window.innerHeight
         };
+    }
+
+    static getUTMProperties() {
+        // Check if running in a browser environment
+        if (typeof window === 'undefined') {
+            return null;
+        }
+
+        let locationHref = window.location.href;
+
+        // Extract query parameters
+        const urlSearchParams = new URLSearchParams(new URL(locationHref).search);
+        let queryParams = {
+            utm_source: urlSearchParams.get('utm_source') || null,
+            utm_medium: urlSearchParams.get('utm_medium') || null,
+            utm_campaign: urlSearchParams.get('utm_campaign') || null,
+            utm_term: urlSearchParams.get('utm_term') || null,
+            utm_content: urlSearchParams.get('utm_content') || null,
+            utm_id: urlSearchParams.get('utm_id') || null,
+            utm_source_platform: urlSearchParams.get('utm_source_platform') || null
+        };
+
+        return queryParams;
     }
 
 }
