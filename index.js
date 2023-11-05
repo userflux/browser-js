@@ -11,7 +11,7 @@ class UserFlux {
         UserFlux.ufApiKey = apiKey;
         UserFlux.startFlushInterval();
 
-        if (options['autoCapturePageViews'] && options['autoCapturePageViews'] == true && typeof window !== 'undefined') {
+        if (options['autoCapture'] && options['autoCapture'] == true && typeof window !== 'undefined') {
             UserFlux.setupPageViewListener();
         }
     }
@@ -31,17 +31,18 @@ class UserFlux {
         // Override pushState to track page views
         history.pushState = function() {
             originalPushState.apply(this, arguments);
-            UserFlux.#trackPageView();
+            UserFlux.trackPageView();
         };
 
         // Track page views on popstate (back/forward navigation)
-        window.addEventListener('popstate', UserFlux.#trackPageView);
+        window.addEventListener('popstate', UserFlux.trackPageView);
 
         // Track initial page view
-        UserFlux.#trackPageView();
+        UserFlux.trackPageView();
     }
 
-    static #trackPageView() {
+    static trackPageView() {
+        // TODO: clean up page view properties + add query parameters
         UserFlux.track('page_view', {
             title: document.title,
             referrer: document.referrer,
@@ -87,6 +88,8 @@ class UserFlux {
 
     static reset() {
         UserFlux.getStorage()?.removeItem('uf-userId');
+        // TODO: remove anon id?
+        // TODO: flush?
     }
 
     static startFlushInterval() {
@@ -104,6 +107,7 @@ class UserFlux {
         if (userId == 'null') userId = null;
         UserFlux.setUserId(userId);
 
+        // TODO: enrich with device properties
         const payload = {
             userId: userId,
             anonymousId: UserFlux.ufAnonymousId,
@@ -122,6 +126,7 @@ class UserFlux {
         if (userId == 'null') userId = null;
         UserFlux.setUserId(userId);
 
+        // TODO: enrich with device properties
         const payload = {
             timestamp: Date.now(),
             userId: userId,
@@ -136,6 +141,7 @@ class UserFlux {
     }
 
     static saveEventsToStorage(key, queue) {
+        // TODO: auto flush if storage doesn't exist
         UserFlux.getStorage()?.setItem(key, JSON.stringify(queue));
     }
 
@@ -155,6 +161,7 @@ class UserFlux {
         UserFlux.saveEventsToStorage(`uf-track`, queue);
     }
 
+    // TODO: make async
     static sendRequest(endpoint, data) {
         if (!UserFlux.isApiKeyProvided()) {
             console.error('API key not provided. Cannot send request.');
