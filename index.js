@@ -45,10 +45,12 @@ class UserFlux {
         const utmProperties = UserFlux.getUTMProperties() || {};
 
         UserFlux.track('page_view', {
-            title: document.title,
-            referrer: document.referrer,
-            referrerDomain: document.referrer ? new URL(document.referrer).hostname : null,
+            host: window.location.host,
+            href: window.location.href,
             path: window.location.pathname,
+            pageTitle: document.title,
+            referrerHref: document.referrer,
+            referrerHost: document.referrer ? new URL(document.referrer).hostname : null,
             ...utmProperties
         });
     }
