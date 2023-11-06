@@ -105,7 +105,6 @@ class UserFlux {
         }, 5000);
     }
 
-    // TODO: make async
     static identify(attributes, userId = UserFlux.ufUserId) {
         if (!UserFlux.isApiKeyProvided()) {
             console.error('API key not provided. Cannot identify user.');
@@ -170,24 +169,25 @@ class UserFlux {
         UserFlux.saveEventsToStorage(`uf-track`, queue);
     }
 
-    // TODO: make async
-    static sendRequest(endpoint, data) {
+    static async sendRequest(endpoint, data) {
         if (!UserFlux.isApiKeyProvided()) {
             console.error('API key not provided. Cannot send request.');
             return;
         }
 
-        fetch(`https://integration-api.userflux.co/${endpoint}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${UserFlux.ufApiKey}`
-            },
-            body: JSON.stringify(data),
-            keepalive: true
-        })
-        .then(response => {})
-        .catch((error) => console.error('Error:', error));
+        try {
+            const response = await fetch(`https://integration-api.userflux.co/${endpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${UserFlux.ufApiKey}`
+                },
+                body: JSON.stringify(data),
+                keepalive: true
+            });
+        } catch (e) {
+            console.error('UF Error: ', error);
+        }
     }
 
     static getDeviceProperties() {
