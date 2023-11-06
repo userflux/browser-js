@@ -7,6 +7,7 @@ class UserFlux {
     static ufTrackQueue = [];
     static ufAnonymousId = '';
     static ufAllowCookies = false;
+    static ufLocationEnrichmentEnabled = true;
 
     static initialize(apiKey, options) {
         UserFlux.ufApiKey = apiKey;
@@ -18,6 +19,10 @@ class UserFlux {
         UserFlux.ufAnonymousId = UserFlux.getOrCreateAnonymousId();
         UserFlux.ufUserId = UserFlux.getUserId();
         UserFlux.ufTrackQueue = UserFlux.loadEventsFromStorage('uf-track');
+
+        if (options['autoEnrich'] && typeof options['autoEnrich'] == 'boolean') {
+            UserFlux.ufLocationEnrichmentEnabled = options['autoEnrich']
+        }
 
         UserFlux.startFlushInterval();
 
@@ -208,7 +213,7 @@ class UserFlux {
         }
 
         try {
-            const response = await fetch(`https://integration-api.userflux.co/${endpoint}`, {
+            const response = await fetch(`https://integration-api.userflux.co/${endpoint}?locationEnrichment=${UserFlux.ufLocationEnrichmentEnabled}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
