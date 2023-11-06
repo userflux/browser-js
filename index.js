@@ -3,9 +3,9 @@ const fetch = require('cross-fetch');
 class UserFlux {
 
     static ufApiKey = null;
-    static ufUserId = UserFlux.getUserId() || null;
-    static ufTrackQueue = UserFlux.loadEventsFromStorage('uf-track') || [];
-    static ufAnonymousId = UserFlux.getOrCreateAnonymousId();
+    static ufUserId = null;
+    static ufTrackQueue = [];
+    static ufAnonymousId = '';
     static ufAllowCookies = false;
 
     static initialize(apiKey, options) {
@@ -14,6 +14,10 @@ class UserFlux {
         if (options['allowCookies'] && options['allowCookies'] == true) {
             UserFlux.ufAllowCookies = true;
         }
+
+        UserFlux.ufAnonymousId = UserFlux.getOrCreateAnonymousId();
+        UserFlux.ufUserId = UserFlux.getUserId();
+        UserFlux.ufTrackQueue = UserFlux.loadEventsFromStorage('uf-track');
 
         UserFlux.startFlushInterval();
 
@@ -84,10 +88,15 @@ class UserFlux {
 
     static getOrCreateAnonymousId() {
         let anonymousId = UserFlux.getLocalStorage()?.getItem('uf-anonymousId');
+
         if (!anonymousId) {
             anonymousId = UserFlux.generateUUID();
             UserFlux.getLocalStorage()?.setItem('uf-anonymousId', anonymousId);
+        } else {
+            // Update anonymousId in local storage to prevent it from expiring
+            UserFlux.getLocalStorage()?.setItem('uf-anonymousId', anonymousId);
         }
+
         return anonymousId;
     }
 
