@@ -134,7 +134,7 @@ class UserFlux {
     static startFlushInterval() {
         setInterval(() => {
             UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', true);
-        }, 5000);
+        }, 1500);
     }
 
     static identify(attributes, userId = UserFlux.ufUserId) {

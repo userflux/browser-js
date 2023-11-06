@@ -18,7 +18,7 @@ Alternatively install without using a package manager
 <head>
     ...
     <script type="module">
-    import UserFlux from 'https://cdn.skypack.dev/@userflux/browser-js@1.0.45'
+    import UserFlux from 'https://cdn.skypack.dev/@userflux/browser-js@1.0.46'
     UserFlux.initialize('<YOUR_WRITE_KEY>', { autoCapture: true, allowCookies: true })
     </script>
 </head>
