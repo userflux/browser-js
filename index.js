@@ -12,7 +12,7 @@ class UserFlux {
     static initialize(apiKey, options) {
         UserFlux.ufApiKey = apiKey;
 
-        if (options['allowCookies'] && options['allowCookies'] == true) {
+        if ('allowCookies' in options && options['allowCookies'] == true) {
             UserFlux.ufAllowCookies = true;
         }
 
@@ -20,13 +20,13 @@ class UserFlux {
         UserFlux.ufUserId = UserFlux.getUserId();
         UserFlux.ufTrackQueue = UserFlux.loadEventsFromStorage('uf-track');
 
-        if (options['autoEnrich'] && typeof options['autoEnrich'] == 'boolean') {
-            UserFlux.ufLocationEnrichmentEnabled = options['autoEnrich']
+        if ('autoEnrich' in options && options['autoEnrich'] == false) {
+            UserFlux.ufLocationEnrichmentEnabled = false;
         }
 
         UserFlux.startFlushInterval();
 
-        if (options['autoCapture'] && options['autoCapture'] == true) {
+        if ('autoCapture' in options && options['autoCapture'] == true) {
             UserFlux.setupPageViewListener();
         }
     }
