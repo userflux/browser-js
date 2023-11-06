@@ -10,7 +10,7 @@ npm i @userflux/browser-js
 2. Import the package and initialise the SDK
 ```
 import UserFlux from '@userflux/browser-js'
-UserFlux.initialize('<YOUR_WRITE_KEY>', { autoCapture: true })
+UserFlux.initialize('<YOUR_WRITE_KEY>', { autoCapture: true, allowCookies: true })
 ```
 
 Alternatively install without using a package manager
@@ -18,8 +18,8 @@ Alternatively install without using a package manager
 <head>
     ...
     <script type="module">
-    import UserFlux from 'https://cdn.skypack.dev/@userflux/browser-js@1.0.42'
-    UserFlux.initialize('<YOUR_WRITE_KEY>', { autoCapture: true })
+    import UserFlux from 'https://cdn.skypack.dev/@userflux/browser-js@1.0.43'
+    UserFlux.initialize('<YOUR_WRITE_KEY>', { autoCapture: true, allowCookies: true })
     </script>
 </head>
 ```

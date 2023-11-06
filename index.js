@@ -6,25 +6,48 @@ class UserFlux {
     static ufUserId = UserFlux.getUserId() || null;
     static ufTrackQueue = UserFlux.loadEventsFromStorage('uf-track') || [];
     static ufAnonymousId = UserFlux.getOrCreateAnonymousId();
+    static ufAllowCookies = false;
 
     static initialize(apiKey, options) {
         UserFlux.ufApiKey = apiKey;
+
+        if (options['allowCookies'] && options['allowCookies'] == true) {
+            UserFlux.ufAllowCookies = true;
+        }
+
         UserFlux.startFlushInterval();
 
-        if (options['autoCapture'] && options['autoCapture'] == true && typeof window !== 'undefined') {
+        if (options['autoCapture'] && options['autoCapture'] == true) {
             UserFlux.setupPageViewListener();
         }
     }
 
-    static getStorage() {
-        if (typeof window !== 'undefined') {
-            return localStorage;
-        } else {
+    static getLocalStorage() {
+        if (typeof window === 'undefined') {
             return null;
         }
+
+        return {
+            setItem: (key, value) => {
+                localStorage.setItem(key, value);
+                if (UserFlux.ufAllowCookies == true) this.setCookie(key, value, 365);
+            },
+            getItem: (key) => {
+                return localStorage.getItem(key) || ((UserFlux.ufAllowCookies == true) ? this.getCookie(key) : null);
+            },
+            removeItem: (key) => {
+                localStorage.removeItem(key);
+                if (UserFlux.ufAllowCookies == true) this.eraseCookie(key);
+            }
+        };
     }
 
     static setupPageViewListener() {
+        // Check if running in a browser environment
+        if (typeof window === 'undefined') {
+            return;
+        }
+
         // Store original pushState function
         const originalPushState = history.pushState;
 
@@ -60,10 +83,10 @@ class UserFlux {
     }
 
     static getOrCreateAnonymousId() {
-        let anonymousId = UserFlux.getStorage()?.getItem('uf-anonymousId');
+        let anonymousId = UserFlux.getLocalStorage()?.getItem('uf-anonymousId');
         if (!anonymousId) {
             anonymousId = UserFlux.generateUUID();
-            UserFlux.getStorage()?.setItem('uf-anonymousId', anonymousId);
+            UserFlux.getLocalStorage()?.setItem('uf-anonymousId', anonymousId);
         }
         return anonymousId;
     }
@@ -77,16 +100,16 @@ class UserFlux {
     }
 
     static getUserId() {
-        return UserFlux.getStorage()?.getItem('uf-userId');
+        return UserFlux.getLocalStorage()?.getItem('uf-userId');
     }
 
     static setUserId(userId) {
         UserFlux.ufUserId = userId;
-        UserFlux.getStorage()?.setItem('uf-userId', userId);
+        UserFlux.getLocalStorage()?.setItem('uf-userId', userId);
     }
 
     static loadEventsFromStorage(key) {
-        const events = UserFlux.getStorage()?.getItem(key);
+        const events = UserFlux.getLocalStorage()?.getItem(key);
         return events ? JSON.parse(events) : [];
     }
 
@@ -95,8 +118,8 @@ class UserFlux {
         UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', true);
 
         // Clear all stored data
-        UserFlux.getStorage()?.removeItem('uf-userId');
-        UserFlux.getStorage()?.removeItem('uf-anonymousId');
+        UserFlux.getLocalStorage()?.removeItem('uf-userId');
+        UserFlux.getLocalStorage()?.removeItem('uf-anonymousId');
     }
 
     static startFlushInterval() {
@@ -145,12 +168,12 @@ class UserFlux {
         UserFlux.ufTrackQueue.push(payload);
         UserFlux.saveEventsToStorage('uf-track', UserFlux.ufTrackQueue);
         
-        const shouldForceFlush = (UserFlux.getStorage() == null);
+        const shouldForceFlush = (UserFlux.getLocalStorage() == null);
         UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', shouldForceFlush);
     }
 
     static saveEventsToStorage(key, queue) {
-        UserFlux.getStorage()?.setItem(key, JSON.stringify(queue));
+        UserFlux.getLocalStorage()?.setItem(key, JSON.stringify(queue));
     }
 
     static checkQueue(queue, eventType, forceFlush) {
@@ -291,6 +314,34 @@ class UserFlux {
             console.error('Error:', error)
             return null;
         }
+    }
+
+    // Utility function to set a cookie
+    static setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days*24*60*60*1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+    }
+
+    // Utility function to get a cookie
+    static getCookie(name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for(let i=0;i < ca.length;i++) {
+            let c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        }
+        return null;
+    }
+
+    // Utility function to erase a cookie
+    static eraseCookie(name) {   
+        document.cookie = name+'=; Max-Age=-99999999;';  
     }
 
 }
