@@ -328,12 +328,19 @@ class UserFlux {
     // Utility function to set a cookie
     static setCookie(name, value, days) {
         let expires = "";
+        
         if (days) {
             const date = new Date();
             date.setTime(date.getTime() + (days*24*60*60*1000));
             expires = "; expires=" + date.toUTCString();
         }
-        document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+
+        // Set SameSite to Lax
+        const sameSite = "; SameSite=Lax";
+        // Lax is compatible with both secure and non-secure sites, but using Secure when available is better
+        const secure = window.location.protocol === 'https:' ? "; Secure" : "";
+    
+        document.cookie = name + "=" + (value || "")  + expires + sameSite + secure + "; path=/";
     }
 
     // Utility function to get a cookie
