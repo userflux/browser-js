@@ -153,7 +153,7 @@ class UserFlux {
         }, 1500);
     }
 
-    static identify(attributes, userId = UserFlux.ufUserId, locationEnrich = UserFlux.ufLocationEnrichmentEnabled) {
+    static identify(attributes, userId = UserFlux.ufUserId) {
         if (!UserFlux.isApiKeyProvided()) {
             console.error('API key not provided. Cannot identify user.');
             return;
@@ -169,10 +169,29 @@ class UserFlux {
             deviceData: UserFlux.getDeviceProperties()
         };
 
-        UserFlux.sendRequest('profile', payload, locationEnrich)
+        UserFlux.sendRequest('profile', payload);
     }
 
-    static track(name, properties, userId = UserFlux.ufUserId, locationEnrich = UserFlux.ufLocationEnrichmentEnabled) {
+    static identifyEnrichDisabled(attributes, userId = UserFlux.ufUserId) {
+        if (!UserFlux.isApiKeyProvided()) {
+            console.error('API key not provided. Cannot identify user.');
+            return;
+        }
+
+        if (userId == 'null' || userId == '' || userId == 'undefined') userId = null;
+        if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId);
+
+        const payload = {
+            userId: userId,
+            anonymousId: UserFlux.ufAnonymousId,
+            properties: attributes,
+            deviceData: UserFlux.getDeviceProperties()
+        };
+
+        UserFlux.sendRequest('profile', payload, false);
+    }
+
+    static track(name, properties, userId = UserFlux.ufUserId) {
         if (!UserFlux.isApiKeyProvided()) {
             console.error('API key not provided. Cannot track event.');
             return;
@@ -190,7 +209,28 @@ class UserFlux {
             deviceData: UserFlux.getDeviceProperties()
         };
 
-        UserFlux.sendRequest('event/ingest/batch', { events: [payload] }, locationEnrich);
+        UserFlux.sendRequest('event/ingest/batch', { events: [payload] });
+    }
+
+    static trackEnrichDisabled(name, properties, userId = UserFlux.ufUserId) {
+        if (!UserFlux.isApiKeyProvided()) {
+            console.error('API key not provided. Cannot track event.');
+            return;
+        }
+
+        if (userId == 'null' || userId == '' || userId == 'undefined') userId = null;
+        if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId);
+
+        const payload = {
+            timestamp: Date.now(),
+            userId: userId,
+            anonymousId: UserFlux.ufAnonymousId,
+            name: name,
+            properties: properties,
+            deviceData: UserFlux.getDeviceProperties()
+        };
+
+        UserFlux.sendRequest('event/ingest/batch', { events: [payload] }, false);
     }
 
     static trackUsingQueue(name, properties, userId = UserFlux.ufUserId) {
