@@ -118,7 +118,14 @@ class UserFlux {
     }
 
     static getUserId() {
-        return UserFlux.getStorage()?.getItem('uf-userId');
+        let userId = UserFlux.getStorage()?.getItem('uf-userId');
+
+        if (userId) {
+            // Update userId in local storage to prevent it from expiring
+            UserFlux.getStorage()?.setItem('uf-userId', userId);
+        }
+
+        return userId;
     }
 
     static setUserId(userId) {
