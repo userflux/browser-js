@@ -31,7 +31,7 @@ class UserFlux {
         }
     }
 
-    static getLocalStorage() {
+    static getStorage() {
         if (typeof window === 'undefined') {
             return null;
         }
@@ -92,14 +92,14 @@ class UserFlux {
     }
 
     static getOrCreateAnonymousId() {
-        let anonymousId = UserFlux.getLocalStorage()?.getItem('uf-anonymousId');
+        let anonymousId = UserFlux.getStorage()?.getItem('uf-anonymousId');
 
         if (!anonymousId) {
             anonymousId = UserFlux.generateUUID();
-            UserFlux.getLocalStorage()?.setItem('uf-anonymousId', anonymousId);
+            UserFlux.getStorage()?.setItem('uf-anonymousId', anonymousId);
         } else {
             // Update anonymousId in local storage to prevent it from expiring
-            UserFlux.getLocalStorage()?.setItem('uf-anonymousId', anonymousId);
+            UserFlux.getStorage()?.setItem('uf-anonymousId', anonymousId);
         }
 
         return anonymousId;
@@ -114,16 +114,16 @@ class UserFlux {
     }
 
     static getUserId() {
-        return UserFlux.getLocalStorage()?.getItem('uf-userId');
+        return UserFlux.getStorage()?.getItem('uf-userId');
     }
 
     static setUserId(userId) {
         UserFlux.ufUserId = userId;
-        UserFlux.getLocalStorage()?.setItem('uf-userId', userId);
+        UserFlux.getStorage()?.setItem('uf-userId', userId);
     }
 
     static loadEventsFromStorage(key) {
-        const events = UserFlux.getLocalStorage()?.getItem(key);
+        const events = UserFlux.getStorage()?.getItem(key);
         return events ? JSON.parse(events) : [];
     }
 
@@ -132,8 +132,8 @@ class UserFlux {
         UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', true);
 
         // Clear all stored data
-        UserFlux.getLocalStorage()?.removeItem('uf-userId');
-        UserFlux.getLocalStorage()?.removeItem('uf-anonymousId');
+        UserFlux.getStorage()?.removeItem('uf-userId');
+        UserFlux.getStorage()?.removeItem('uf-anonymousId');
     }
 
     static startFlushInterval() {
@@ -182,12 +182,12 @@ class UserFlux {
         UserFlux.ufTrackQueue.push(payload);
         UserFlux.saveEventsToStorage('uf-track', UserFlux.ufTrackQueue);
         
-        const shouldForceFlush = (UserFlux.getLocalStorage() == null);
+        const shouldForceFlush = (UserFlux.getStorage() == null);
         UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', shouldForceFlush);
     }
 
     static saveEventsToStorage(key, queue) {
-        UserFlux.getLocalStorage()?.setItem(key, JSON.stringify(queue));
+        UserFlux.getStorage()?.setItem(key, JSON.stringify(queue));
     }
 
     static checkQueue(queue, eventType, forceFlush) {
