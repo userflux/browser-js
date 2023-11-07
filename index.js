@@ -10,24 +10,28 @@ class UserFlux {
     static ufLocationEnrichmentEnabled = true;
 
     static initialize(apiKey, options) {
-        UserFlux.ufApiKey = apiKey;
+        try {
+            UserFlux.ufApiKey = apiKey;
 
-        if ('allowCookies' in options && options['allowCookies'] == true) {
-            UserFlux.ufAllowCookies = true;
-        }
+            if ('allowCookies' in options && options['allowCookies'] == true) {
+                UserFlux.ufAllowCookies = true;
+            }
 
-        UserFlux.ufAnonymousId = UserFlux.getOrCreateAnonymousId();
-        UserFlux.ufUserId = UserFlux.getUserId();
-        UserFlux.ufTrackQueue = UserFlux.loadEventsFromStorage('uf-track');
+            UserFlux.ufAnonymousId = UserFlux.getOrCreateAnonymousId();
+            UserFlux.ufUserId = UserFlux.getUserId();
+            UserFlux.ufTrackQueue = UserFlux.loadEventsFromStorage('uf-track');
 
-        if ('autoEnrich' in options && options['autoEnrich'] == false) {
-            UserFlux.ufLocationEnrichmentEnabled = false;
-        }
+            if ('autoEnrich' in options && options['autoEnrich'] == false) {
+                UserFlux.ufLocationEnrichmentEnabled = false;
+            }
 
-        UserFlux.startFlushInterval();
+            UserFlux.startFlushInterval();
 
-        if ('autoCapture' in options && options['autoCapture'] == true) {
-            UserFlux.setupPageViewListener();
+            if ('autoCapture' in options && options['autoCapture'] == true) {
+                UserFlux.setupPageViewListener();
+            }
+        } catch (error) {
+            console.error('Failed to initialize UserFlux SDK: ', error);
         }
     }
 
@@ -222,7 +226,7 @@ class UserFlux {
                 body: JSON.stringify(data),
                 keepalive: true
             });
-        } catch (e) {
+        } catch (error) {
             console.error('UF Error: ', error);
         }
     }
@@ -296,7 +300,7 @@ class UserFlux {
                 browserWidth: window.innerWidth,
                 browserHeight: window.innerHeight
             };
-        } catch (e) {
+        } catch (error) {
             console.error('Error:', error)
             return null;
         }
@@ -324,7 +328,7 @@ class UserFlux {
             };
 
             return queryParams;
-        } catch (e) {
+        } catch (error) {
             console.error('Error:', error)
             return null;
         }
