@@ -160,7 +160,7 @@ class UserFlux {
         }
 
         if (userId == 'null' || userId == '' || userId == 'undefined') userId = null;
-        UserFlux.setUserId(userId);
+        if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId);
 
         const payload = {
             userId: userId,
@@ -179,7 +179,7 @@ class UserFlux {
         }
 
         if (userId == 'null' || userId == '' || userId == 'undefined') userId = null;
-        UserFlux.setUserId(userId);
+        if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId);
 
         const payload = {
             timestamp: Date.now(),

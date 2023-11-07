@@ -7,5 +7,5 @@ declare module '@userflux/browser-js' {
         static reset(): void;
     }
 
-    export = UserFlux;    
+    export = UserFlux;
 }
