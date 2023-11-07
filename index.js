@@ -348,8 +348,12 @@ class UserFlux {
         const sameSite = "; SameSite=Lax";
         // Lax is compatible with both secure and non-secure sites, but using Secure when available is better
         const secure = window.location.protocol === 'https:' ? "; Secure" : "";
+
+        // Dynamically determine the base domain
+        const hostname = window.location.hostname;
+        const domain = hostname.includes('.') ? '; domain=.' + hostname.split('.').slice(-2).join('.') : '';
     
-        document.cookie = name + "=" + (value || "")  + expires + sameSite + secure + "; path=/";
+        document.cookie = name + "=" + (value || "")  + expires + sameSite + secure + domain + "; path=/";
     }
 
     // Utility function to get a cookie
