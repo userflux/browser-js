@@ -336,43 +336,53 @@ class UserFlux {
 
             return queryParams;
         } catch (error) {
-            console.error('Error:', error)
+            console.error('Error: ', error)
             return null;
         }
     }
 
     // Utility function to set a cookie
     static setCookie(name, value, days) {
-        let expires = "";
+        try {
+            let expires = "";
+            
+            if (days) {
+                const date = new Date();
+                date.setTime(date.getTime() + (days*24*60*60*1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+
+            // Set SameSite to Lax
+            const sameSite = "; SameSite=Lax";
+            // Lax is compatible with both secure and non-secure sites, but using Secure when available is better
+            const secure = window.location.protocol === 'https:' ? "; Secure" : "";
+
+            // Dynamically determine the base domain
+            const hostMatchRegex = /[a-z0-9][a-z0-9-]+\.[a-z]{2,}$/i
+            const matches = document.location.hostname.match(hostMatchRegex);
+            const domain = matches ? '; domain=.' + matches[0] : '';
         
-        if (days) {
-            const date = new Date();
-            date.setTime(date.getTime() + (days*24*60*60*1000));
-            expires = "; expires=" + date.toUTCString();
+            document.cookie = name + "=" + (value || "")  + expires + sameSite + secure + domain + "; path=/";
+        } catch (error) {
+            console.error('Error:', error)
         }
-
-        // Set SameSite to Lax
-        const sameSite = "; SameSite=Lax";
-        // Lax is compatible with both secure and non-secure sites, but using Secure when available is better
-        const secure = window.location.protocol === 'https:' ? "; Secure" : "";
-
-        // Dynamically determine the base domain
-        const hostname = window.location.hostname;
-        const domain = hostname.includes('.') ? '; domain=.' + hostname.split('.').slice(-2).join('.') : '';
-    
-        document.cookie = name + "=" + (value || "")  + expires + sameSite + secure + domain + "; path=/";
     }
 
     // Utility function to get a cookie
     static getCookie(name) {
-        const nameEQ = name + "=";
-        const ca = document.cookie.split(';');
-        for(let i=0;i < ca.length;i++) {
-            let c = ca[i];
-            while (c.charAt(0)==' ') c = c.substring(1,c.length);
-            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        try {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for(let i=0;i < ca.length;i++) {
+                let c = ca[i];
+                while (c.charAt(0)==' ') c = c.substring(1,c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+            }
+            return null;
+        } catch (error) {
+            console.error('Error:', error)
+            return null;
         }
-        return null;
     }
 
     // Utility function to erase a cookie
