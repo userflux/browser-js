@@ -28,7 +28,7 @@ class UserFlux {
             UserFlux.startFlushInterval();
 
             if ('autoCapture' in options && options['autoCapture'] == true) {
-                UserFlux.setupPageViewListener();
+                UserFlux.setupAutoTracking();
             }
         } catch (error) {
             console.error('Failed to initialize UserFlux SDK: ', error);
@@ -53,6 +53,12 @@ class UserFlux {
                 if (UserFlux.ufAllowCookies == true) this.eraseCookie(key);
             }
         };
+    }
+
+    static setupAutoTracking() {
+        UserFlux.setupPageViewListener();
+        UserFlux.setupClickListener();
+        UserFlux.setupPageLeaveListener();
     }
 
     static setupPageViewListener() {
@@ -81,13 +87,64 @@ class UserFlux {
         const utmProperties = UserFlux.getUTMProperties() || {};
 
         UserFlux.trackUsingQueue('page_view', {
-            host: window.location.host,
-            href: window.location.href,
-            path: window.location.pathname,
-            pageTitle: document.title,
+            ...UserFlux.getPageViewProperties(),
             referrerHref: document.referrer,
             referrerHost: document.referrer ? new URL(document.referrer).hostname : null,
             ...utmProperties
+        });
+    }
+
+    static getPageViewProperties() {
+        // Check if running in a browser environment
+        if (typeof window === 'undefined') {
+            return {};
+        }
+
+        return {
+            host: window.location.host,
+            href: window.location.href,
+            path: window.location.pathname,
+            pageTitle: document.title
+        };
+    }
+
+    static setupClickListener() {
+        // Check if running in a browser environment
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        document.addEventListener('click', (event) => {
+            // You can add more logic here to filter clicks you want to track
+            UserFlux.trackClick(event);
+        });
+    }
+
+    static setupPageLeaveListener() {
+        // Check if running in a browser environment
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        window.addEventListener('beforeunload', (event) => {
+            UserFlux.trackPageLeave();
+        });
+    }
+
+    static trackClick(event) {
+        // You can extract more properties from the event if needed
+        UserFlux.trackUsingQueue('click', {
+            elementTagName: event.target.tagName,
+            elementInnerText: event.target.innerText,
+            elementClassName: event.target.className,
+            elementId: event.target.id,
+            ...UserFlux.getPageViewProperties()
+        });
+    }
+
+    static trackPageLeave() {
+        UserFlux.trackUsingQueue('page_leave', {
+            ...UserFlux.getPageViewProperties()
         });
     }
 
