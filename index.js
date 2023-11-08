@@ -57,6 +57,8 @@ class UserFlux {
 
     static setupAutoTracking() {
         UserFlux.setupPageViewListener();
+
+        // disabling these for now
         // UserFlux.setupClickListener();
         // UserFlux.setupPageLeaveListener();
     }
@@ -115,8 +117,12 @@ class UserFlux {
         }
 
         document.addEventListener('click', (event) => {
-            // You can add more logic here to filter clicks you want to track
-            UserFlux.trackClick(event);
+            const element = event.target.closest('a, button, input[type="submit"], input[type="button"]');
+
+            // If the clicked element or its parent is not what we want to track, return early.
+            if (!element) return;
+
+            UserFlux.trackClick(event, element);
         });
     }
 
@@ -131,15 +137,24 @@ class UserFlux {
         });
     }
 
-    static trackClick(event) {
-        // You can extract more properties from the event if needed
-        UserFlux.trackUsingQueue('click', {
-            elementTagName: event.target.tagName,
-            elementInnerText: event.target.innerText,
-            elementClassName: event.target.className,
-            elementId: event.target.id,
+    static trackClick(event, element) {
+        // elementClassName: element.className,
+        const properties = {
+            elementTagName: element.tagName,
+            elementInnerText: element.innerText && element.innerText.length < 200 ? element.innerText.trim() : undefined,
+            elementId: element.id && element.id !== '' ? element.id : undefined,
             ...UserFlux.getPageViewProperties()
-        });
+        };
+
+        // Filter out properties that are undefined
+        const filteredProperties = Object.keys(properties).reduce((obj, key) => {
+            if (properties[key] !== undefined) {
+                obj[key] = properties[key];
+            }
+            return obj;
+        }, {});
+
+        UserFlux.trackUsingQueue('click', filteredProperties);
     }
 
     static trackPageLeave() {
