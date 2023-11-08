@@ -8,6 +8,7 @@ class UserFlux {
     static ufAnonymousId = '';
     static ufAllowCookies = false;
     static ufLocationEnrichmentEnabled = true;
+    static ufDefaultTrackingProperties = {};
 
     static initialize(apiKey, options) {
         try {
@@ -23,6 +24,10 @@ class UserFlux {
 
             if ('autoEnrich' in options && options['autoEnrich'] == false) {
                 UserFlux.ufLocationEnrichmentEnabled = false;
+            }
+
+            if ('defaultTrackingProperties' in options && typeof options['defaultTrackingProperties'] === 'object') {
+                UserFlux.ufDefaultTrackingProperties = options['defaultTrackingProperties'];
             }
 
             UserFlux.startFlushInterval();
@@ -283,12 +288,17 @@ class UserFlux {
         if (userId == 'null' || userId == '' || userId == 'undefined') userId = null;
         if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId);
 
+        const finalProperties = {
+            ...properties,
+            ...UserFlux.ufDefaultTrackingProperties
+        };
+
         const payload = {
             timestamp: Date.now(),
             userId: userId,
             anonymousId: UserFlux.ufAnonymousId,
             name: name,
-            properties: properties,
+            properties: finalProperties,
             deviceData: UserFlux.getDeviceProperties()
         };
 
@@ -304,12 +314,17 @@ class UserFlux {
         if (userId == 'null' || userId == '' || userId == 'undefined') userId = null;
         if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId);
 
+        const finalProperties = {
+            ...properties,
+            ...UserFlux.ufDefaultTrackingProperties
+        };
+
         const payload = {
             timestamp: Date.now(),
             userId: userId,
             anonymousId: UserFlux.ufAnonymousId,
             name: name,
-            properties: properties,
+            properties: finalProperties,
             deviceData: UserFlux.getDeviceProperties()
         };
 
@@ -325,12 +340,17 @@ class UserFlux {
         if (userId == 'null' || userId == '' || userId == 'undefined') userId = null;
         if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId);
 
+        const finalProperties = {
+            ...properties,
+            ...UserFlux.ufDefaultTrackingProperties
+        };
+
         const payload = {
             timestamp: Date.now(),
             userId: userId,
             anonymousId: UserFlux.ufAnonymousId,
             name: name,
-            properties: properties,
+            properties: finalProperties,
             deviceData: UserFlux.getDeviceProperties()
         };
 
