@@ -57,8 +57,8 @@ class UserFlux {
 
     static setupAutoTracking() {
         UserFlux.setupPageViewListener();
-        UserFlux.setupClickListener();
-        UserFlux.setupPageLeaveListener();
+        // UserFlux.setupClickListener();
+        // UserFlux.setupPageLeaveListener();
     }
 
     static setupPageViewListener() {
