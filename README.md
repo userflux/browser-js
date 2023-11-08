@@ -3,57 +3,66 @@ UserFlux's Browser JavaScript SDK - send your frontend analytics data to the Use
 
 # Getting Started
 ## 1. Install the package
-```
+```bash
 npm i @userflux/browser-js
 ```
 ###
-## 2. Import the package and initialise the SDK
-```
+## 2. Initialise the SDK
+```javascript
 import UserFlux from '@userflux/browser-js'
-UserFlux.initialize('<YOUR_WRITE_KEY>', { autoCapture: ['page_views', 'page_leaves', 'clicks'], allowCookies: true, autoEnrich: true, defaultTrackingProperties: { releaseVersion: '2.0.14' } })
+UserFlux.initialize('<YOUR_WRITE_KEY>', { 
+    autoCapture: ['page_views', 'page_leaves'], 
+    allowCookies: true, 
+    autoEnrich: true, 
+    defaultTrackingProperties: { ... } 
+})
 ```
 
 The `initialize` method takes two arguments:
 - `writeKey` - Your UserFlux write key. You can find this in the UserFlux dashboard under `Management > Account Settings > Developers > Write Key`
 - `options` - An object containing the following optional properties:
-    - `autoCapture` - An array of events to automatically capture. The following events are available:
+    - `autoCapture` - An array of strings used to define which events to automatically capture. Defaults to none. The following events are available:
         - `page_views` - Capture page views
         - `page_leaves` - Capture page leaves
         - `clicks` - Capture clicks
         - `all` - Capture all of the above events
     - `allowCookies` - A boolean indicating whether or not to allow cookies. Defaults to `true`
     - `autoEnrich` - A boolean indicating whether or not to automatically enrich events with additional information. Defaults to `true`
-    - `defaultTrackingProperties` - An object containing default properties to be sent with every event. Defaults to an empty object
+    - `defaultTrackingProperties` - An object containing any default properties to be sent with every event. Defaults to an empty object
 
 ###
 ## 3. Tracking events
-Track an event associated with a profile by the users unique identifier
+```javascript
+UserFlux.track('event_name', { ... }, '<USER_ID>')
 ```
-UserFlux.track('signup', { referringDomain: 'https://google.com' }, '<USER_ID>')
-```
-Track an event without providing a user id. If no user id has been provided previously, the event will be associated with the anonymous profile
-```
-UserFlux.track('signup', { referringDomain: 'https://google.com' })
-```
+
+The `track` method takes three arguments:
+- `eventName` - The name of the event you wish to track
+- `eventProperties` - An object containing properties associated with the event
+- `userId` - The unique identifier of the user you wish to associate the event with. This is optional, if no user id is provided the event will be associated with the anonymous profile
 ###
 ## 4. Identifying users
-Set new properties for a profile by the users unique identifier
+```javascript
+UserFlux.identify({ ... }, '<USER_ID>')
 ```
-UserFlux.identify({ location: 'Sydney' }, '<USER_ID>')
-```
-Set new properties without providing a user id. If no user id has been provided previously, the properties will be associated with the anonymous profile
-```
-UserFlux.identify({ location: 'Sydney' })
-```
+
+The `identify` method takes two arguments:
+- `userProperties` - An object containing properties associated with the user
+- `userId` - The unique identifier of the user you wish to identify. This is optional, if no user id is provided the event will be associated with the anonymous profile
 ###
-# Alternative Installation Options
+# Alternative Installation
 If you do not want to use the NPM package manger, simply drop the following into your HTML
-```
+```html
 <head>
     ...
     <script type="module" async>
-    import UserFlux from 'https://cdn.skypack.dev/@userflux/browser-js@1.0.59'
-    UserFlux.initialize('<YOUR_WRITE_KEY>', { autoCapture: ['page_views', 'page_leaves', 'clicks'], allowCookies: true, autoEnrich: true, defaultTrackingProperties: { releaseVersion: '2.0.14' } })
+    import UserFlux from 'https://cdn.skypack.dev/@userflux/browser-js@<version>'
+    UserFlux.initialize('<YOUR_WRITE_KEY>', { 
+        autoCapture: ['all'], 
+        allowCookies: true, 
+        autoEnrich: true, 
+        defaultTrackingProperties: { ... } 
+    })
     </script>
 </head>
 ```
