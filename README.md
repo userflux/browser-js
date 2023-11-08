@@ -2,12 +2,15 @@
 UserFlux's Browser JavaScript SDK - send your frontend analytics data to the UserFlux platform.
 
 # Getting Started
+
 ## 1. Install the package
+
 ```bash
 npm i @userflux/browser-js
 ```
-###
+
 ## 2. Initialise the SDK
+
 ```javascript
 import UserFlux from '@userflux/browser-js'
 UserFlux.initialize('<YOUR_WRITE_KEY>', { 
@@ -27,11 +30,11 @@ The `initialize` method takes two arguments:
         - `clicks` - Capture clicks
         - `all` - Capture all of the above events
     - `allowCookies` - A boolean indicating whether or not to allow cookies. Defaults to `true`
-    - `autoEnrich` - A boolean indicating whether or not to automatically enrich events with additional information. Defaults to `true`
+    - `autoEnrich` - A boolean indicating whether or not to automatically enrich events with additional information such as location and device properties. Defaults to `true`
     - `defaultTrackingProperties` - An object containing any default properties to be sent with every event. Defaults to an empty object
 
-###
 ## 3. Tracking events
+
 ```javascript
 UserFlux.track('event_name', { ... }, '<USER_ID>')
 ```
@@ -40,8 +43,9 @@ The `track` method takes three arguments:
 - `eventName` - The name of the event you wish to track
 - `eventProperties` - An object containing properties associated with the event
 - `userId` - The unique identifier of the user you wish to associate the event with. This is optional, if no user id is provided the event will be associated with the anonymous profile
-###
+
 ## 4. Identifying users
+
 ```javascript
 UserFlux.identify({ ... }, '<USER_ID>')
 ```
@@ -49,7 +53,51 @@ UserFlux.identify({ ... }, '<USER_ID>')
 The `identify` method takes two arguments:
 - `userProperties` - An object containing properties associated with the user
 - `userId` - The unique identifier of the user you wish to identify. This is optional, if no user id is provided the event will be associated with the anonymous profile
-###
+
+# Other Methods Available
+
+## updateDefaultTrackingProperties
+```javascript
+UserFlux.updateDefaultTrackingProperties({ ... })
+```
+
+If at any time you wish to update the default tracking properties, you can do so by calling the `updateDefaultTrackingProperties` method.
+
+The `updateDefaultTrackingProperties` method takes one argument:
+- `defaultTrackingProperties` - An object containing any default properties to be sent with every event.
+
+## reset
+
+```javascript
+UserFlux.reset()
+```
+
+If at any time you wish to reset the SDK, you can do so by calling the `reset` method. This will clear any cookies / local storage and reset the SDK to its initial state.
+
+## trackEnrichDisabled
+
+```javascript
+UserFlux.trackEnrichDisabled('event_name', { ... }, '<USER_ID>')
+```
+
+If you have enabled `autoEnrich` in the global options, you can disable this for individual events by calling the `trackEnrichDisabled` method.
+
+## identifyEnrichDisabled
+
+```javascript
+UserFlux.identifyEnrichDisabled({ ... }, '<USER_ID>')
+```
+
+If you have enabled `autoEnrich` in the global options, you can disable this for individual identify calls by calling the `identifyEnrichDisabled` method.
+
+## trackPageView
+
+```javascript
+UserFlux.trackPageView()
+```
+
+If you have disabled `autoCapture` in the global options, you can manually capture page views by calling the `trackPageView` method.
+
 # Alternative Installation
 If you do not want to use the NPM package manger, simply drop the following into your HTML
 ```html
