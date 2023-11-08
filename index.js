@@ -40,6 +40,15 @@ class UserFlux {
         }
     }
 
+    static updateDefaultTrackingProperties(properties) {
+        if (typeof properties !== 'object') {
+            console.error('UF defaultTrackingProperties must be an object.');
+            return;
+        }
+        
+        UserFlux.ufDefaultTrackingProperties = properties;
+    }
+
     static getStorage() {
         if (typeof window === 'undefined') {
             return null;
