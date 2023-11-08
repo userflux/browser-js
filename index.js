@@ -421,10 +421,10 @@ class UserFlux {
                 os = 'Mac OS X';
             } else if (userAgent.indexOf('Windows NT') > -1) {
                 os = 'Windows';
-            } else if (userAgent.indexOf('Linux') > -1) {
-                os = 'Linux';
             } else if (userAgent.indexOf('Android') > -1) {
                 os = 'Android';
+            } else if (userAgent.indexOf('Linux') > -1) {
+                os = 'Linux';
             } else {
                 os = 'Unknown';
             }
