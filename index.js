@@ -27,8 +27,8 @@ class UserFlux {
 
             UserFlux.startFlushInterval();
 
-            if ('autoCapture' in options && options['autoCapture'] == true) {
-                UserFlux.setupAutoTracking();
+            if ('autoCapture' in options) {
+                UserFlux.setupAutoTracking(options['autoCapture']);
             }
         } catch (error) {
             console.error('Failed to initialize UserFlux SDK: ', error);
@@ -55,12 +55,23 @@ class UserFlux {
         };
     }
 
-    static setupAutoTracking() {
-        UserFlux.setupPageViewListener();
+    static setupAutoTracking(autoCaptureOptions) {
+        if (typeof autoCaptureOptions !== 'object') { // The typeof operator returns " object " for arrays because in JavaScript arrays are objects.
+            console.error('UF autoCapture must be an array.');
+            return;
+        }
 
-        // disabling these for now
-        // UserFlux.setupClickListener();
-        // UserFlux.setupPageLeaveListener();
+        if (autoCaptureOptions.includes('page_views') || autoCaptureOptions.includes('all')) {
+            UserFlux.setupPageViewListener();
+        }
+
+        if (autoCaptureOptions.includes('page_leaves') || autoCaptureOptions.includes('all')) {
+            UserFlux.setupPageLeaveListener();
+        }
+
+        if (autoCaptureOptions.includes('clicks') || autoCaptureOptions.includes('all')) {
+            UserFlux.setupClickListener();
+        }
     }
 
     static setupPageViewListener() {
