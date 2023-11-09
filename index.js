@@ -94,20 +94,23 @@ class UserFlux {
             return;
         }
 
-        // Store original pushState function
-        const originalPushState = history.pushState;
-
-        // Override pushState to track page views
-        history.pushState = function() {
-            originalPushState.apply(this, arguments);
-            UserFlux.trackPageView();
-        };
-
-        // Track page views on popstate (back/forward navigation)
-        window.addEventListener('popstate', UserFlux.trackPageView);
+        window.addEventListener("pageshow", (event) => { 
+            UserFlux.trackPageView(); 
+        });
 
         // Track initial page view
         UserFlux.trackPageView();
+    }
+
+    static setupPageLeaveListener() {
+        // Check if running in a browser environment
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        window.addEventListener('pagehide', (event) => {
+            UserFlux.trackPageLeave();
+        });
     }
 
     static trackPageView() {
@@ -148,17 +151,6 @@ class UserFlux {
             if (!element) return;
 
             UserFlux.trackClick(event, element);
-        });
-    }
-
-    static setupPageLeaveListener() {
-        // Check if running in a browser environment
-        if (typeof window === 'undefined') {
-            return;
-        }
-
-        window.addEventListener('beforeunload', (event) => {
-            UserFlux.trackPageLeave();
         });
     }
 
