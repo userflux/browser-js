@@ -97,9 +97,6 @@ class UserFlux {
         window.addEventListener("pageshow", (event) => { 
             UserFlux.trackPageView(); 
         });
-
-        // Track initial page view
-        UserFlux.trackPageView();
     }
 
     static setupPageLeaveListener() {
