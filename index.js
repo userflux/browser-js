@@ -214,6 +214,10 @@ class UserFlux {
         return userId;
     }
 
+    static getAnonymousId() {
+        return UserFlux.getOrCreateAnonymousId();
+    }
+
     static setUserId(userId) {
         UserFlux.ufUserId = userId;
         UserFlux.getStorage()?.setItem('uf-userId', userId);

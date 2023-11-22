@@ -8,6 +8,8 @@ declare module '@userflux/browser-js' {
         static trackEnrichDisabled(name: string, properties: object, userId?: string | undefined): void;
         static reset(): void;
         static updateDefaultTrackingProperties(properties: object): void;
+        static getUserId(): string | null;
+        static getAnonymousId(): string | null;
     }
 
     export = UserFlux;

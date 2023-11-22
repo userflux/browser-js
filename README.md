@@ -98,6 +98,22 @@ UserFlux.trackPageView()
 
 If you have disabled `autoCapture` in the global options, you can manually capture page views by calling the `trackPageView` method.
 
+## getUserId
+
+```javascript
+UserFlux.getUserId()
+```
+
+If you have provided a `userId` in the `identify` or `track` methods, you can retrieve this by calling the `getUserId` method.
+
+## getAnonymousId
+
+```javascript
+UserFlux.getAnonymousId()
+```
+
+You can retrieve the anonymous id by calling the `getAnonymousId` method. This is the id that will be used if no `userId` is provided in the `identify` or `track` methods.
+
 # Alternative Installation
 If you do not want to use the NPM package manger, simply drop the following into your HTML
 ```html
