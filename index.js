@@ -112,11 +112,11 @@ class UserFlux {
 
     static trackPageView() {
         const utmProperties = UserFlux.getUTMProperties() || {};
+        const referrerProperties = UserFlux.getReferrerProperties() || {};
 
         UserFlux.trackUsingQueue('page_view', {
             ...UserFlux.getPageViewProperties(),
-            referrerHref: document.referrer,
-            referrerHost: document.referrer ? new URL(document.referrer).hostname : null,
+            ...referrerProperties,
             ...utmProperties
         });
     }
@@ -501,6 +501,23 @@ class UserFlux {
             };
 
             return queryParams;
+        } catch (error) {
+            console.error('Error: ', error)
+            return null;
+        }
+    }
+
+    static getReferrerProperties() {
+        try {
+            // Check if running in a browser environment
+            if (typeof window === 'undefined') {
+                return null;
+            }
+
+            return {
+                referrerHref: document.referrer,
+                referrerHost: document.referrer ? new URL(document.referrer).hostname : null,
+            }
         } catch (error) {
             console.error('Error: ', error)
             return null;
