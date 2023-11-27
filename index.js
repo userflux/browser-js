@@ -281,6 +281,56 @@ class UserFlux {
         UserFlux.sendRequest('profile', payload, false);
     }
 
+    static trackV2(parameters) {
+        // sanity check API key
+        if (!UserFlux.isApiKeyProvided()) {
+            console.error('API key not provided. Cannot track event.');
+            return;
+        }
+
+        // sanity check parameters
+        if (!parameters || typeof parameters !== 'object') {
+            console.error('Invalid parameters passed to track method');
+            return;
+        }
+
+        // sanity check event
+        const event = parameters.event;
+        if (!event || typeof event !== 'string' || event == 'null' || event == '' || event == 'undefined') {
+            console.error('Invalid event passed to track method');
+            return;
+        }
+
+        // sanity check userId
+        const userId = parameters.userId || UserFlux.ufUserId;
+        if (userId && (typeof userId !== 'string' || userId == 'null' || userId == '' || userId == 'undefined')) userId = null;
+        if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId);
+
+        // sanity check properties
+        const properties = parameters.properties || {};
+        if (typeof properties !== 'object') {
+            console.error('Invalid properties passed to track method');
+            return;
+        }
+
+        // combine event properties with any default tracking properties
+        const finalProperties = {
+            ...properties,
+            ...UserFlux.ufDefaultTrackingProperties
+        };
+
+        const payload = {
+            timestamp: Date.now(),
+            userId: userId,
+            anonymousId: UserFlux.ufAnonymousId,
+            name: event,
+            properties: finalProperties,
+            deviceData: UserFlux.getDeviceProperties()
+        };
+
+        UserFlux.sendRequest('event/ingest/batch', { events: [payload] });
+    }
+
     static track(name, properties, userId = UserFlux.ufUserId) {
         if (!UserFlux.isApiKeyProvided()) {
             console.error('API key not provided. Cannot track event.');
