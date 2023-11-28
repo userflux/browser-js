@@ -8,6 +8,7 @@ class UserFlux {
     static ufAnonymousId = '';
     static ufAllowCookies = false;
     static ufLocationEnrichmentEnabled = true;
+    static ufDeviceDataEnrichmentEnabled = true;
     static ufDefaultTrackingProperties = {};
 
     static initialize(apiKey, options) {
@@ -24,6 +25,7 @@ class UserFlux {
 
             if ('autoEnrich' in options && options['autoEnrich'] == false) {
                 UserFlux.ufLocationEnrichmentEnabled = false;
+                UserFlux.ufDeviceDataEnrichmentEnabled = false;
             }
 
             if ('defaultTrackingProperties' in options && typeof options['defaultTrackingProperties'] === 'object') {
@@ -111,13 +113,14 @@ class UserFlux {
     }
 
     static trackPageView() {
-        const utmProperties = UserFlux.getUTMProperties() || {};
-        const referrerProperties = UserFlux.getReferrerProperties() || {};
-
-        UserFlux.trackUsingQueue('page_view', {
-            ...UserFlux.getPageViewProperties(),
-            ...referrerProperties,
-            ...utmProperties
+        UserFlux.track({
+            event: 'page_view', 
+            properties: {
+                ...UserFlux.getPageViewProperties(),
+                ...UserFlux.getReferrerProperties() || {},
+                ...UserFlux.getUTMProperties() || {}
+            },
+            addToQueue: true
         });
     }
 
@@ -147,12 +150,11 @@ class UserFlux {
             // If the clicked element or its parent is not what we want to track, return early.
             if (!element) return;
 
-            UserFlux.trackClick(event, element);
+            UserFlux.trackClick(element);
         });
     }
 
-    static trackClick(event, element) {
-        // elementClassName: element.className,
+    static trackClick(element) {
         const properties = {
             elementTagName: element.tagName,
             elementInnerText: element.innerText && element.innerText.length < 200 ? element.innerText.trim() : undefined,
@@ -168,12 +170,22 @@ class UserFlux {
             return obj;
         }, {});
 
-        UserFlux.trackUsingQueue('click', filteredProperties);
+        UserFlux.track({
+            event: 'click', 
+            properties: {
+                ...filteredProperties
+            },
+            addToQueue: true
+        });
     }
 
     static trackPageLeave() {
-        UserFlux.trackUsingQueue('page_leave', {
-            ...UserFlux.getPageViewProperties()
+        UserFlux.track({
+            event: 'page_leave', 
+            properties: {
+                ...UserFlux.getPageViewProperties()
+            },
+            addToQueue: true
         });
     }
 
@@ -281,7 +293,7 @@ class UserFlux {
         UserFlux.sendRequest('profile', payload, false);
     }
 
-    static trackV2(parameters) {
+    static track(parameters) {
         // sanity check API key
         if (!UserFlux.isApiKeyProvided()) {
             console.error('API key not provided. Cannot track event.');
@@ -313,6 +325,27 @@ class UserFlux {
             return;
         }
 
+        // sanity check enrichDeviceData
+        const enrichDeviceData = parameters.enrichDeviceData || UserFlux.ufDeviceDataEnrichmentEnabled;
+        if (typeof enrichDeviceData !== 'boolean') {
+            console.error('Invalid enrichDeviceData passed to track method');
+            return;
+        }
+
+        // sanity check enrichLocationData
+        const enrichLocationData = parameters.enrichLocationData || UserFlux.ufLocationEnrichmentEnabled;
+        if (typeof enrichLocationData !== 'boolean') {
+            console.error('Invalid enrichLocationData passed to track method');
+            return;
+        }
+
+        // sanity check addToQueue
+        const addToQueue = parameters.addToQueue || false;
+        if (typeof addToQueue !== 'boolean') {
+            console.error('Invalid addToQueue passed to track method');
+            return;
+        }
+
         // combine event properties with any default tracking properties
         const finalProperties = {
             ...properties,
@@ -325,92 +358,17 @@ class UserFlux {
             anonymousId: UserFlux.ufAnonymousId,
             name: event,
             properties: finalProperties,
-            deviceData: UserFlux.getDeviceProperties()
+            deviceData: enrichDeviceData ? UserFlux.getDeviceProperties() : null
         };
 
-        UserFlux.sendRequest('event/ingest/batch', { events: [payload] });
-    }
-
-    static track(name, properties, userId = UserFlux.ufUserId) {
-        if (!UserFlux.isApiKeyProvided()) {
-            console.error('API key not provided. Cannot track event.');
-            return;
+        if (addToQueue) {
+            const shouldForceFlush = (UserFlux.getStorage() == null);
+            UserFlux.ufTrackQueue.push(payload);
+            UserFlux.saveEventsToStorage('uf-track', UserFlux.ufTrackQueue);
+            UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', shouldForceFlush);
+        } else {
+            UserFlux.sendRequest('event/ingest/batch', { events: [payload] }, enrichLocationData);
         }
-
-        if (userId == 'null' || userId == '' || userId == 'undefined') userId = null;
-        if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId);
-
-        const finalProperties = {
-            ...properties,
-            ...UserFlux.ufDefaultTrackingProperties
-        };
-
-        const payload = {
-            timestamp: Date.now(),
-            userId: userId,
-            anonymousId: UserFlux.ufAnonymousId,
-            name: name,
-            properties: finalProperties,
-            deviceData: UserFlux.getDeviceProperties()
-        };
-
-        UserFlux.sendRequest('event/ingest/batch', { events: [payload] });
-    }
-
-    static trackEnrichDisabled(name, properties, userId = UserFlux.ufUserId) {
-        if (!UserFlux.isApiKeyProvided()) {
-            console.error('API key not provided. Cannot track event.');
-            return;
-        }
-
-        if (userId == 'null' || userId == '' || userId == 'undefined') userId = null;
-        if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId);
-
-        const finalProperties = {
-            ...properties,
-            ...UserFlux.ufDefaultTrackingProperties
-        };
-
-        const payload = {
-            timestamp: Date.now(),
-            userId: userId,
-            anonymousId: UserFlux.ufAnonymousId,
-            name: name,
-            properties: finalProperties,
-            deviceData: UserFlux.getDeviceProperties()
-        };
-
-        UserFlux.sendRequest('event/ingest/batch', { events: [payload] }, false);
-    }
-
-    static trackUsingQueue(name, properties, userId = UserFlux.ufUserId) {
-        if (!UserFlux.isApiKeyProvided()) {
-            console.error('API key not provided. Cannot track event.');
-            return;
-        }
-
-        if (userId == 'null' || userId == '' || userId == 'undefined') userId = null;
-        if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId);
-
-        const finalProperties = {
-            ...properties,
-            ...UserFlux.ufDefaultTrackingProperties
-        };
-
-        const payload = {
-            timestamp: Date.now(),
-            userId: userId,
-            anonymousId: UserFlux.ufAnonymousId,
-            name: name,
-            properties: finalProperties,
-            deviceData: UserFlux.getDeviceProperties()
-        };
-
-        UserFlux.ufTrackQueue.push(payload);
-        UserFlux.saveEventsToStorage('uf-track', UserFlux.ufTrackQueue);
-        
-        const shouldForceFlush = (UserFlux.getStorage() == null);
-        UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', shouldForceFlush);
     }
 
     static saveEventsToStorage(key, queue) {
