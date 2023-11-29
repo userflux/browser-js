@@ -255,42 +255,53 @@ class UserFlux {
         }, 1500);
     }
 
-    static identify(attributes, userId = UserFlux.ufUserId) {
+    static identify(parameters) {
+        // sanity check API key
         if (!UserFlux.isApiKeyProvided()) {
             console.error('API key not provided. Cannot identify user.');
             return;
         }
 
-        if (userId == 'null' || userId == '' || userId == 'undefined') userId = null;
-        if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId);
-
-        const payload = {
-            userId: userId,
-            anonymousId: UserFlux.ufAnonymousId,
-            properties: attributes,
-            deviceData: UserFlux.getDeviceProperties()
-        };
-
-        UserFlux.sendRequest('profile', payload);
-    }
-
-    static identifyEnrichDisabled(attributes, userId = UserFlux.ufUserId) {
-        if (!UserFlux.isApiKeyProvided()) {
-            console.error('API key not provided. Cannot identify user.');
+        // sanity check parameters
+        if (!parameters || typeof parameters !== 'object') {
+            console.error('Invalid parameters passed to track method');
             return;
         }
 
-        if (userId == 'null' || userId == '' || userId == 'undefined') userId = null;
+        // sanity check userId
+        const userId = parameters.userId || UserFlux.ufUserId;
+        if (userId && (typeof userId !== 'string' || userId == 'null' || userId == '' || userId == 'undefined')) userId = null;
         if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId);
+
+        // sanity check attributes
+        const attributes = parameters.attributes || {};
+        if (typeof attributes !== 'object') {
+            console.error('Invalid attributes passed to identify method');
+            return;
+        }
+
+        // sanity check enrichDeviceData
+        const enrichDeviceData = parameters.enrichDeviceData || UserFlux.ufDeviceDataEnrichmentEnabled;
+        if (typeof enrichDeviceData !== 'boolean') {
+            console.error('Invalid enrichDeviceData passed to identify method');
+            return;
+        }
+
+        // sanity check enrichLocationData
+        const enrichLocationData = parameters.enrichLocationData || UserFlux.ufLocationEnrichmentEnabled;
+        if (typeof enrichLocationData !== 'boolean') {
+            console.error('Invalid enrichLocationData passed to identify method');
+            return;
+        }
 
         const payload = {
             userId: userId,
             anonymousId: UserFlux.ufAnonymousId,
             properties: attributes,
-            deviceData: UserFlux.getDeviceProperties()
+            deviceData: enrichDeviceData ? UserFlux.getDeviceProperties() : null
         };
 
-        UserFlux.sendRequest('profile', payload, false);
+        UserFlux.sendRequest('profile', payload, enrichLocationData);
     }
 
     static track(parameters) {
