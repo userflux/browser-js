@@ -556,7 +556,7 @@ class UserFlux {
             }
 
             return {
-                referrerHref: document.referrer,
+                referrerHref: (document.referrer !== '') ? document.referrer : null,
                 referrerHost: document.referrer ? new URL(document.referrer).hostname : null,
             }
         } catch (error) {
