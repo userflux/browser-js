@@ -41,17 +41,23 @@ UserFlux.track({
     properties: { ... },
     userId: '<USER_ID>',
     enrichDeviceData: true,
-    enrichLocationData: true
+    enrichLocationData: true,
+    enrichPageProperties: true,
+    enrichReferrerProperties: true,
+    enrichUTMProperties: true
 })
 ```
 
 The `track` method takes a single argument:
 - `parameters` - An object containing the following properties:
     - `event` - (required) A string representing the name of the event
-    - `properties` - (optional) An object containing any properties to be sent with the event. Defaults to an empty object`defaultTrackingProperties` option will be merged with these properties
+    - `properties` - (optional) An object containing any properties to be sent with the event. Defaults to an empty object. Any `defaultTrackingProperties` provided in the global options will be merged with these properties
     - `userId` - (optional) A string representing the user ID of the user you're identifying with attributes
     - `enrichDeviceData` - (optional) A boolean indicating whether or not to enrich the event with device data. Defaults to the value of `autoEnrich` in the global options
     - `enrichLocationData` - (optional) A boolean indicating whether or not to enrich the event with location data. Defaults to the value of `autoEnrich` in the global options
+    - `enrichPageProperties` - (optional) A boolean indicating whether or not to enrich the event with page properties. Defaults to `false`
+    - `enrichReferrerProperties` - (optional) A boolean indicating whether or not to enrich the event with referrer properties. Defaults to `false`
+    - `enrichUTMProperties` - (optional) A boolean indicating whether or not to enrich the event with UTM properties. Defaults to `false`
 
 ## 4. Identifying users
 

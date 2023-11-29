@@ -116,7 +116,7 @@ class UserFlux {
         UserFlux.track({
             event: 'page_view', 
             properties: {
-                ...UserFlux.getPageViewProperties(),
+                ...UserFlux.getPageProperties(),
                 ...UserFlux.getReferrerProperties() || {},
                 ...UserFlux.getUTMProperties() || {}
             },
@@ -124,7 +124,7 @@ class UserFlux {
         });
     }
 
-    static getPageViewProperties() {
+    static getPageProperties() {
         // Check if running in a browser environment
         if (typeof window === 'undefined') {
             return {};
@@ -159,7 +159,7 @@ class UserFlux {
             elementTagName: element.tagName,
             elementInnerText: element.innerText && element.innerText.length < 200 ? element.innerText.trim() : undefined,
             elementId: element.id && element.id !== '' ? element.id : undefined,
-            ...UserFlux.getPageViewProperties()
+            ...UserFlux.getPageProperties()
         };
 
         // Filter out properties that are undefined
@@ -183,7 +183,7 @@ class UserFlux {
         UserFlux.track({
             event: 'page_leave', 
             properties: {
-                ...UserFlux.getPageViewProperties()
+                ...UserFlux.getPageProperties()
             },
             addToQueue: true
         });
@@ -350,6 +350,24 @@ class UserFlux {
             return;
         }
 
+        const enrichPageProperties = parameters.enrichPageProperties || false;
+        if (typeof enrichPageProperties !== 'boolean') {
+            console.error('Invalid enrichPageProperties passed to track method');
+            return;
+        }
+
+        const enrichReferrerProperties = parameters.enrichReferrerProperties || false;
+        if (typeof enrichReferrerProperties !== 'boolean') {
+            console.error('Invalid enrichReferrerProperties passed to track method');
+            return;
+        }
+
+        const enrichUTMProperties = parameters.enrichUTMProperties || false;
+        if (typeof enrichUTMProperties !== 'boolean') {
+            console.error('Invalid enrichUTMProperties passed to track method');
+            return;
+        }
+
         // sanity check addToQueue
         const addToQueue = parameters.addToQueue || false;
         if (typeof addToQueue !== 'boolean') {
@@ -360,7 +378,10 @@ class UserFlux {
         // combine event properties with any default tracking properties
         const finalProperties = {
             ...properties,
-            ...UserFlux.ufDefaultTrackingProperties
+            ...UserFlux.ufDefaultTrackingProperties,
+            ...enrichPageProperties ? UserFlux.getPageProperties() : {},
+            ...enrichReferrerProperties ? UserFlux.getReferrerProperties() : {},
+            ...enrichUTMProperties ? UserFlux.getUTMProperties() : {}
         };
 
         const payload = {
