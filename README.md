@@ -97,22 +97,6 @@ UserFlux.reset()
 
 If at any time you wish to reset the SDK, you can do so by calling the `reset` method. This will clear any cookies / local storage and reset the SDK to its initial state.
 
-## trackEnrichDisabled
-
-```javascript
-UserFlux.trackEnrichDisabled('event_name', { ... }, '<USER_ID>')
-```
-
-If you have enabled `autoEnrich` in the global options, you can disable this for individual events by calling the `trackEnrichDisabled` method.
-
-## identifyEnrichDisabled
-
-```javascript
-UserFlux.identifyEnrichDisabled({ ... }, '<USER_ID>')
-```
-
-If you have enabled `autoEnrich` in the global options, you can disable this for individual identify calls by calling the `identifyEnrichDisabled` method.
-
 ## trackPageView
 
 ```javascript
