@@ -273,10 +273,10 @@ class UserFlux {
         if (userId && (typeof userId !== 'string' || userId == 'null' || userId == '' || userId == 'undefined')) userId = null;
         if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId);
 
-        // sanity check attributes
-        const attributes = parameters.attributes || {};
-        if (typeof attributes !== 'object') {
-            console.error('Invalid attributes passed to identify method');
+        // sanity check properties
+        const properties = parameters.properties || {};
+        if (typeof properties !== 'object') {
+            console.error('Invalid properties passed to identify method');
             return;
         }
 
@@ -297,7 +297,7 @@ class UserFlux {
         const payload = {
             userId: userId,
             anonymousId: UserFlux.ufAnonymousId,
-            properties: attributes,
+            properties: properties,
             deviceData: enrichDeviceData ? UserFlux.getDeviceProperties() : null
         };
 

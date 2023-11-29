@@ -14,7 +14,7 @@ npm i @userflux/browser-js
 ```javascript
 import UserFlux from '@userflux/browser-js'
 UserFlux.initialize('<YOUR_WRITE_KEY>', { 
-    autoCapture: ['page_views', 'page_leaves'], 
+    autoCapture: ['page_views', 'page_leaves', 'clicks'], 
     allowCookies: true, 
     autoEnrich: true, 
     defaultTrackingProperties: { ... } 
@@ -36,23 +36,40 @@ The `initialize` method takes two arguments:
 ## 3. Tracking events
 
 ```javascript
-UserFlux.track('event_name', { ... }, '<USER_ID>')
+UserFlux.track({
+    event: 'event_name',
+    properties: { ... },
+    userId: '<USER_ID>',
+    enrichDeviceData: true,
+    enrichLocationData: true
+})
 ```
 
-The `track` method takes three arguments:
-- `eventName` - The name of the event you wish to track
-- `eventProperties` - An object containing properties associated with the event
-- `userId` - The unique identifier of the user you wish to associate the event with. This is optional, if no user id is provided the event will be associated with the anonymous profile
+The `track` method takes a single argument:
+- `parameters` - An object containing the following properties:
+    - `event` - (required) A string representing the name of the event
+    - `properties` - (optional) An object containing any properties to be sent with the event. Defaults to an empty object`defaultTrackingProperties` option will be merged with these properties
+    - `userId` - (optional) A string representing the user ID of the user you're identifying with attributes
+    - `enrichDeviceData` - (optional) A boolean indicating whether or not to enrich the event with device data. Defaults to the value of `autoEnrich` in the global options
+    - `enrichLocationData` - (optional) A boolean indicating whether or not to enrich the event with location data. Defaults to the value of `autoEnrich` in the global options
 
 ## 4. Identifying users
 
 ```javascript
-UserFlux.identify({ ... }, '<USER_ID>')
+UserFlux.identify({
+    properties: { ... },
+    userId: '<USER_ID>',
+    enrichDeviceData: true,
+    enrichLocationData: true
+})
 ```
 
-The `identify` method takes two arguments:
-- `userProperties` - An object containing properties associated with the user
-- `userId` - The unique identifier of the user you wish to identify. This is optional, if no user id is provided the event will be associated with the anonymous profile
+The `identify` method takes a single argument:
+- `parameters` - An object containing the following properties:
+    - `properties` - (required) An object containing any attributes to be associated with the users profile
+    - `userId` - (optional) A string representing the user ID of the user you're identifying with attributes
+    - `enrichDeviceData` - (optional) A boolean indicating whether or not to enrich the event with device data. Defaults to the value of `autoEnrich` in the global options
+    - `enrichLocationData` - (optional) A boolean indicating whether or not to enrich the event with location data. Defaults to the value of `autoEnrich` in the global options
 
 # Other Methods Available
 
