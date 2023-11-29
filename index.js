@@ -269,7 +269,7 @@ class UserFlux {
         }
 
         // sanity check userId
-        const userId = parameters.userId || UserFlux.ufUserId;
+        let userId = parameters.userId || UserFlux.ufUserId;
         if (userId && (typeof userId !== 'string' || userId == 'null' || userId == '' || userId == 'undefined')) userId = null;
         if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId);
 
@@ -325,7 +325,7 @@ class UserFlux {
         }
 
         // sanity check userId
-        const userId = parameters.userId || UserFlux.ufUserId;
+        let userId = parameters.userId || UserFlux.ufUserId;
         if (userId && (typeof userId !== 'string' || userId == 'null' || userId == '' || userId == 'undefined')) userId = null;
         if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId);
 
