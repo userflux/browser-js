@@ -255,7 +255,7 @@ class UserFlux {
         }, 1500);
     }
 
-    static identify(parameters) {
+    static async identify(parameters) {
         // sanity check API key
         if (!UserFlux.isApiKeyProvided()) {
             console.error('API key not provided. Cannot identify user.');
@@ -301,10 +301,10 @@ class UserFlux {
             deviceData: enrichDeviceData ? UserFlux.getDeviceProperties() : null
         };
 
-        UserFlux.sendRequest('profile', payload, enrichLocationData);
+        return await UserFlux.sendRequest('profile', payload, enrichLocationData);
     }
 
-    static track(parameters) {
+    static async track(parameters) {
         // sanity check API key
         if (!UserFlux.isApiKeyProvided()) {
             console.error('API key not provided. Cannot track event.');
@@ -377,8 +377,9 @@ class UserFlux {
             UserFlux.ufTrackQueue.push(payload);
             UserFlux.saveEventsToStorage('uf-track', UserFlux.ufTrackQueue);
             UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', shouldForceFlush);
+            return null;
         } else {
-            UserFlux.sendRequest('event/ingest/batch', { events: [payload] }, enrichLocationData);
+            return await UserFlux.sendRequest('event/ingest/batch', { events: [payload] }, enrichLocationData);
         }
     }
 
@@ -409,7 +410,7 @@ class UserFlux {
         }
 
         try {
-            const response = await fetch(`https://integration-api.userflux.co/${endpoint}?locationEnrichment=${locationEnrich}`, {
+            return await fetch(`https://integration-api.userflux.co/${endpoint}?locationEnrichment=${locationEnrich}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
