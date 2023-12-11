@@ -124,20 +124,6 @@ class UserFlux {
         });
     }
 
-    static getPageProperties() {
-        // Check if running in a browser environment
-        if (typeof window === 'undefined') {
-            return {};
-        }
-
-        return {
-            host: window.location.host,
-            href: window.location.href,
-            path: window.location.pathname,
-            pageTitle: document.title
-        };
-    }
-
     static setupClickListener() {
         // Check if running in a browser environment
         if (typeof window === 'undefined') {
@@ -217,8 +203,15 @@ class UserFlux {
 
     static getUserId() {
         let userId = UserFlux.getStorage()?.getItem('uf-userId');
+        
+        // clean up any wrongly stored user ids
+        let shouldForceUpdate = false;
+        if (userId == 'null' || userId == '' || userId == 'undefined') {
+            userId = null;
+            shouldForceUpdate = true;
+        }
 
-        if (userId) {
+        if (userId || shouldForceUpdate) {
             // Update userId in local storage to prevent it from expiring
             UserFlux.getStorage()?.setItem('uf-userId', userId);
         }
@@ -442,6 +435,25 @@ class UserFlux {
             });
         } catch (error) {
             console.error('UF Error: ', error);
+        }
+    }
+
+    static getPageProperties() {
+        try {
+            // Check if running in a browser environment
+            if (typeof window === 'undefined') {
+                return {};
+            }
+
+            return {
+                host: window.location.host,
+                href: window.location.href,
+                path: window.location.pathname,
+                pageTitle: document.title
+            };
+        } catch (e) {
+            console.error('Error on getPageProperties:', error)
+            return {};
         }
     }
 
