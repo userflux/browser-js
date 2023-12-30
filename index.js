@@ -21,7 +21,7 @@ class UserFlux {
 
             UserFlux.ufAnonymousId = UserFlux.getOrCreateAnonymousId();
             UserFlux.ufUserId = UserFlux.getUserId();
-            UserFlux.ufTrackQueue = UserFlux.loadEventsFromStorage('uf-track');
+            UserFlux.ufTrackQueue = UserFlux.loadEventsFromStorage();
 
             if ('autoEnrich' in options && options['autoEnrich'] == false) {
                 UserFlux.ufLocationEnrichmentEnabled = false;
@@ -228,9 +228,15 @@ class UserFlux {
         UserFlux.getStorage()?.setItem('uf-userId', userId);
     }
 
-    static loadEventsFromStorage(key) {
-        const events = UserFlux.getStorage()?.getItem(key);
-        return events ? JSON.parse(events) : [];
+    static loadEventsFromStorage() {
+        try {
+            const events = UserFlux.getStorage()?.getItem('uf-track');
+            return events ? JSON.parse(events) : [];
+        } catch (error) {
+            console.error('Failed to get tracking events from storage: ', error);
+            UserFlux.getStorage()?.removeItem('uf-track');
+            return [];
+        }
     }
 
     static reset() {
