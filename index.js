@@ -244,8 +244,13 @@ class UserFlux {
         UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', true);
 
         // Clear all stored data
+        UserFlux.ufUserId = null;
         UserFlux.getStorage()?.removeItem('uf-userId');
+
+        UserFlux.ufAnonymousId = null;
         UserFlux.getStorage()?.removeItem('uf-anonymousId');
+
+        UserFlux.ufAnonymousId = UserFlux.getOrCreateAnonymousId();
     }
 
     static startFlushInterval() {
