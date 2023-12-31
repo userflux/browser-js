@@ -628,8 +628,17 @@ class UserFlux {
     }
 
     // Utility function to erase a cookie
-    static eraseCookie(name) {   
-        document.cookie = name+'=; Max-Age=-99999999;';  
+    static eraseCookie(name) {
+        try {
+            // Dynamically determine the base domain
+            const hostMatchRegex = /[a-z0-9][a-z0-9-]+\.[a-z]{2,}$/i
+            const matches = document.location.hostname.match(hostMatchRegex);
+            const domain = matches ? '; domain=.' + matches[0] : '';
+
+            document.cookie = name+'=; Max-Age=-99999999; path=/' + '; domain=.' + domain;
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
 
 }
