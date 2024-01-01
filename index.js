@@ -193,6 +193,10 @@ class UserFlux {
         return anonymousId;
     }
 
+    static createNewAnonymousId() {
+        return UserFlux.generateUUID();
+    }
+
     static generateUUID() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             var r = (Math.random() * 16) | 0,
@@ -250,7 +254,8 @@ class UserFlux {
         UserFlux.ufAnonymousId = null;
         UserFlux.getStorage()?.removeItem('uf-anonymousId');
 
-        UserFlux.ufAnonymousId = UserFlux.getOrCreateAnonymousId();
+        UserFlux.ufAnonymousId = UserFlux.createNewAnonymousId();
+        UserFlux.getStorage()?.setItem('uf-anonymousId', UserFlux.ufAnonymousId);
     }
 
     static startFlushInterval() {
