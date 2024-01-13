@@ -243,9 +243,9 @@ class UserFlux {
         }
     }
 
-    static reset() {
+    static async reset() {
         // Firstly, flush any pending events
-        UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', true);
+        await UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', true);
 
         // Clear all stored data
         UserFlux.ufUserId = null;
@@ -259,8 +259,8 @@ class UserFlux {
     }
 
     static startFlushInterval() {
-        setInterval(() => {
-            UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', true);
+        setInterval(async () => {
+            await UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', true);
         }, 1500);
     }
 
@@ -406,30 +406,34 @@ class UserFlux {
             const shouldForceFlush = (UserFlux.getStorage() == null);
             UserFlux.ufTrackQueue.push(payload);
             UserFlux.saveEventsToStorage('uf-track', UserFlux.ufTrackQueue);
-            UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', shouldForceFlush);
+            await UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', shouldForceFlush);
             return null;
         } else {
             return await UserFlux.sendRequest('event/ingest/batch', { events: [payload] }, enrichLocationData);
         }
     }
 
+    static async flush() {
+        await UserFlux.checkQueue(UserFlux.ufTrackQueue, 'event/ingest/batch', true);
+    }
+
     static saveEventsToStorage(key, queue) {
         UserFlux.getStorage()?.setItem(key, JSON.stringify(queue));
     }
 
-    static checkQueue(queue, eventType, forceFlush) {
+    static async checkQueue(queue, eventType, forceFlush) {
         if (queue.length >= 10 || (forceFlush && queue.length > 0)) {
-            UserFlux.flushEvents(queue, eventType);
+            await UserFlux.flushEvents(queue, eventType);
         }
     }
 
-    static flushEvents(queue, eventType) {
+    static async flushEvents(queue, eventType) {
         if (!UserFlux.isApiKeyProvided()) {
             console.error('API key not provided. Cannot flush events.');
             return;
         }
 
-        UserFlux.sendRequest(eventType, { events: queue.splice(0, 10) });
+        await UserFlux.sendRequest(eventType, { events: queue.splice(0, 10) });
         UserFlux.saveEventsToStorage(`uf-track`, queue);
     }
 
