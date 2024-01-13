@@ -435,6 +435,11 @@ class UserFlux {
 
         await UserFlux.sendRequest(eventType, { events: queue.splice(0, 10) });
         UserFlux.saveEventsToStorage(`uf-track`, queue);
+
+        // If the queue is not empty, check it again
+        if (queue.length > 0) {
+            await UserFlux.checkQueue(queue, eventType, true);
+        }
     }
 
     static async sendRequest(endpoint, data, locationEnrich = UserFlux.ufLocationEnrichmentEnabled) {

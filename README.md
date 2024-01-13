@@ -92,10 +92,18 @@ The `updateDefaultTrackingProperties` method takes one argument:
 ## reset
 
 ```javascript
-UserFlux.reset()
+await UserFlux.reset()
 ```
 
-If at any time you wish to reset the SDK, you can do so by calling the `reset` method. This will clear any cookies / local storage and reset the SDK to its initial state.
+If at any time you wish to reset the SDK, you can do so by calling the `reset` method. This will flush any events, clear any cookies / local storage, and reset the SDK to its initial state.
+
+## flush 
+    
+```javascript
+await UserFlux.flush()
+```
+
+This will flush any pending events and send them to the UserFlux platform.
 
 ## trackPageView
 
