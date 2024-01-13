@@ -112,8 +112,8 @@ class UserFlux {
         });
     }
 
-    static trackPageView() {
-        UserFlux.track({
+    static async trackPageView() {
+        await UserFlux.track({
             event: 'page_view', 
             properties: {
                 ...UserFlux.getPageProperties(),
@@ -411,6 +411,15 @@ class UserFlux {
         } else {
             return await UserFlux.sendRequest('event/ingest/batch', { events: [payload] }, enrichLocationData);
         }
+    }
+
+    static async trackBatch(events) {
+        for (const event of events) {
+            await UserFlux.track({ ...event, addToQueue: true });
+        }
+
+        await UserFlux.flush();
+        return;
     }
 
     static async flush() {

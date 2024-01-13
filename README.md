@@ -36,7 +36,7 @@ The `initialize` method takes two arguments:
 ## 3. Tracking events
 
 ```javascript
-UserFlux.track({
+await UserFlux.track({
     event: 'event_name',
     properties: { ... },
     userId: '<USER_ID>',
@@ -62,7 +62,7 @@ The `track` method takes a single argument:
 ## 4. Identifying users
 
 ```javascript
-UserFlux.identify({
+await UserFlux.identify({
     properties: { ... },
     userId: '<USER_ID>',
     enrichDeviceData: true,
@@ -78,6 +78,36 @@ The `identify` method takes a single argument:
     - `enrichLocationData` - (optional) A boolean indicating whether or not to enrich the event with location data. Defaults to the value of `autoEnrich` in the global options
 
 # Other Methods Available
+
+## trackBatch
+
+```javascript
+await UserFlux.trackBatch([
+    {
+        event: 'event_name',
+        properties: { ... },
+        userId: '<USER_ID>',
+        enrichDeviceData: true,
+        enrichLocationData: true,
+        enrichPageProperties: true,
+        enrichReferrerProperties: true,
+        enrichUTMProperties: true
+    },
+    {
+        event: 'event_name',
+        properties: { ... },
+        userId: '<USER_ID>',
+        enrichDeviceData: true,
+        enrichLocationData: true,
+        enrichPageProperties: true,
+        enrichReferrerProperties: true,
+        enrichUTMProperties: true
+    }
+])
+```
+
+The `trackBatch` method takes a single argument:
+- `events` - An array of objects. See the `track` method for details of the properties available for each object.
 
 ## updateDefaultTrackingProperties
 ```javascript
@@ -108,7 +138,7 @@ This will flush any pending events and send them to the UserFlux platform.
 ## trackPageView
 
 ```javascript
-UserFlux.trackPageView()
+await UserFlux.trackPageView()
 ```
 
 If you have disabled `autoCapture` in the global options, you can manually capture page views by calling the `trackPageView` method.
