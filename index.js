@@ -182,7 +182,7 @@ class UserFlux {
     static getOrCreateAnonymousId() {
         let anonymousId = UserFlux.getStorage()?.getItem('uf-anonymousId');
 
-        if (!anonymousId) {
+        if (!anonymousId || anonymousId == null || anonymousId == undefined) {
             anonymousId = UserFlux.generateUUID();
             UserFlux.getStorage()?.setItem('uf-anonymousId', anonymousId);
         } else {
@@ -305,7 +305,7 @@ class UserFlux {
 
         const payload = {
             userId: userId,
-            anonymousId: UserFlux.ufAnonymousId,
+            anonymousId: UserFlux.getOrCreateAnonymousId(),
             properties: properties,
             deviceData: enrichDeviceData ? UserFlux.getDeviceProperties() : null
         };
@@ -396,7 +396,7 @@ class UserFlux {
         const payload = {
             timestamp: Date.now(),
             userId: userId,
-            anonymousId: UserFlux.ufAnonymousId,
+            anonymousId: UserFlux.getOrCreateAnonymousId(),
             name: event,
             properties: finalProperties,
             deviceData: enrichDeviceData ? UserFlux.getDeviceProperties() : null
