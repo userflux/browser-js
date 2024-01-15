@@ -58,15 +58,28 @@ class UserFlux {
 
         return {
             setItem: (key, value) => {
-                localStorage.setItem(key, value);
-                if (UserFlux.ufAllowCookies == true) this.setCookie(key, value, 365);
+                try {
+                    if (UserFlux.isLocalStorageAccessible()) localStorage.setItem(key, value);
+                    if (UserFlux.ufAllowCookies == true) UserFlux.setCookie(key, value, 365);
+                } catch (error) {
+                    console.info('Error setting item to storage: ', error);
+                }
             },
             getItem: (key) => {
-                return localStorage.getItem(key) || ((UserFlux.ufAllowCookies == true) ? this.getCookie(key) : null);
+                try {
+                    return (UserFlux.isLocalStorageAccessible() ? localStorage.getItem(key) : null) || ((UserFlux.ufAllowCookies == true) ? UserFlux.getCookie(key) : null);
+                } catch (error) {
+                    console.info('Error getting item from storage: ', error);
+                    return null;
+                }
             },
             removeItem: (key) => {
-                localStorage.removeItem(key);
-                if (UserFlux.ufAllowCookies == true) this.eraseCookie(key);
+                try {
+                    if (UserFlux.isLocalStorageAccessible()) localStorage.removeItem(key);
+                    if (UserFlux.ufAllowCookies == true) UserFlux.eraseCookie(key);
+                } catch (error) {
+                    console.info('Error removing item from storage: ', error);
+                }
             }
         };
     }
@@ -180,15 +193,17 @@ class UserFlux {
     }
 
     static getOrCreateAnonymousId() {
-        let anonymousId = UserFlux.getStorage()?.getItem('uf-anonymousId');
+        let anonymousId = (UserFlux.ufAnonymousId != '') ? UserFlux.ufAnonymousId : UserFlux.getStorage()?.getItem('uf-anonymousId');
 
-        if (!anonymousId || anonymousId == null || anonymousId == undefined) {
-            anonymousId = UserFlux.generateUUID();
+        if (!anonymousId || anonymousId == null || anonymousId == undefined || anonymousId == '') {
+            anonymousId = UserFlux.createNewAnonymousId();
             UserFlux.getStorage()?.setItem('uf-anonymousId', anonymousId);
         } else {
             // Update anonymousId in local storage to prevent it from expiring
             UserFlux.getStorage()?.setItem('uf-anonymousId', anonymousId);
         }
+
+        UserFlux.ufAnonymousId = anonymousId;
 
         return anonymousId;
     }
