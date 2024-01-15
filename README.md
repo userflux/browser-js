@@ -44,7 +44,8 @@ await UserFlux.track({
     enrichLocationData: true,
     enrichPageProperties: true,
     enrichReferrerProperties: true,
-    enrichUTMProperties: true
+    enrichUTMProperties: true,
+    addToQueue: true
 })
 ```
 
@@ -58,6 +59,7 @@ The `track` method takes a single argument:
     - `enrichPageProperties` - (optional) A boolean indicating whether or not to enrich the event with page properties. Defaults to `false`
     - `enrichReferrerProperties` - (optional) A boolean indicating whether or not to enrich the event with referrer properties. Defaults to `false`
     - `enrichUTMProperties` - (optional) A boolean indicating whether or not to enrich the event with UTM properties. Defaults to `false`
+    - `addToQueue` - (optional) A boolean indicating whether or not to add the event to the queue. Defaults to `false`. If `false`, the event will be sent immediately
 
 ## 4. Identifying users
 
@@ -165,7 +167,7 @@ If you do not want to use the NPM package manger, simply drop the following into
 <head>
     ...
     <script type="module" async>
-    import UserFlux from 'https://cdn.skypack.dev/@userflux/browser-js@<version>'
+    import UserFlux from 'https://cdn.skypack.dev/@userflux/browser-js'
     UserFlux.initialize('<YOUR_WRITE_KEY>', { 
         autoCapture: ['all'], 
         allowCookies: true, 
