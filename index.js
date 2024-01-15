@@ -669,6 +669,18 @@ class UserFlux {
         }
     }
 
+    static isLocalStorageAccessible() {
+        try {
+            // Try to use localStorage
+            localStorage.setItem('uf-ls-test', 'test');
+            localStorage.removeItem('uf-ls-test');
+            return true;
+        } catch (e) {
+            // Catch any errors, including security-related ones
+            return false;
+        }
+    }
+
 }
 
 module.exports = UserFlux;
