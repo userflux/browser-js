@@ -221,7 +221,7 @@ class UserFlux {
     }
 
     static getUserId() {
-        let userId = UserFlux.getStorage()?.getItem('uf-userId');
+        let userId = UserFlux.ufUserId || UserFlux.getStorage()?.getItem('uf-userId');
         
         // clean up any wrongly stored user ids
         let shouldForceUpdate = false;
