@@ -38,13 +38,13 @@ class UserFlux {
                 UserFlux.setupAutoTracking(options['autoCapture']);
             }
         } catch (error) {
-            console.error('Failed to initialize UserFlux SDK: ', error);
+            console.info('Failed to initialize UserFlux SDK: ', error);
         }
     }
 
     static updateDefaultTrackingProperties(properties) {
         if (typeof properties !== 'object') {
-            console.error('UF defaultTrackingProperties must be an object.');
+            console.info('UF defaultTrackingProperties must be an object.');
             return;
         }
         
@@ -73,7 +73,7 @@ class UserFlux {
 
     static setupAutoTracking(autoCaptureOptions) {
         if (typeof autoCaptureOptions !== 'object') { // The typeof operator returns " object " for arrays because in JavaScript arrays are objects.
-            console.error('UF autoCapture must be an array.');
+            console.info('UF autoCapture must be an array.');
             return;
         }
 
@@ -237,7 +237,7 @@ class UserFlux {
             const events = UserFlux.getStorage()?.getItem('uf-track');
             return events ? JSON.parse(events) : [];
         } catch (error) {
-            console.error('Failed to get tracking events from storage: ', error);
+            console.info('Failed to get tracking events from storage: ', error);
             UserFlux.getStorage()?.removeItem('uf-track');
             return [];
         }
@@ -267,13 +267,13 @@ class UserFlux {
     static async identify(parameters) {
         // sanity check API key
         if (!UserFlux.isApiKeyProvided()) {
-            console.error('API key not provided. Cannot identify user.');
+            console.info('API key not provided. Cannot identify user.');
             return;
         }
 
         // sanity check parameters
         if (!parameters || typeof parameters !== 'object') {
-            console.error('Invalid parameters passed to track method');
+            console.info('Invalid parameters passed to track method');
             return;
         }
 
@@ -285,21 +285,21 @@ class UserFlux {
         // sanity check properties
         const properties = parameters.properties || {};
         if (typeof properties !== 'object') {
-            console.error('Invalid properties passed to identify method');
+            console.info('Invalid properties passed to identify method');
             return;
         }
 
         // sanity check enrichDeviceData
         const enrichDeviceData = parameters.enrichDeviceData || UserFlux.ufDeviceDataEnrichmentEnabled;
         if (typeof enrichDeviceData !== 'boolean') {
-            console.error('Invalid enrichDeviceData passed to identify method');
+            console.info('Invalid enrichDeviceData passed to identify method');
             return;
         }
 
         // sanity check enrichLocationData
         const enrichLocationData = parameters.enrichLocationData || UserFlux.ufLocationEnrichmentEnabled;
         if (typeof enrichLocationData !== 'boolean') {
-            console.error('Invalid enrichLocationData passed to identify method');
+            console.info('Invalid enrichLocationData passed to identify method');
             return;
         }
 
@@ -316,20 +316,20 @@ class UserFlux {
     static async track(parameters) {
         // sanity check API key
         if (!UserFlux.isApiKeyProvided()) {
-            console.error('API key not provided. Cannot track event.');
+            console.info('API key not provided. Cannot track event.');
             return;
         }
 
         // sanity check parameters
         if (!parameters || typeof parameters !== 'object') {
-            console.error('Invalid parameters passed to track method');
+            console.info('Invalid parameters passed to track method');
             return;
         }
 
         // sanity check event
         const event = parameters.event;
         if (!event || typeof event !== 'string' || event == 'null' || event == '' || event == 'undefined') {
-            console.error('Invalid event passed to track method');
+            console.info('Invalid event passed to track method');
             return;
         }
 
@@ -341,46 +341,46 @@ class UserFlux {
         // sanity check properties
         const properties = parameters.properties || {};
         if (typeof properties !== 'object') {
-            console.error('Invalid properties passed to track method');
+            console.info('Invalid properties passed to track method');
             return;
         }
 
         // sanity check enrichDeviceData
         const enrichDeviceData = parameters.enrichDeviceData || UserFlux.ufDeviceDataEnrichmentEnabled;
         if (typeof enrichDeviceData !== 'boolean') {
-            console.error('Invalid enrichDeviceData passed to track method');
+            console.info('Invalid enrichDeviceData passed to track method');
             return;
         }
 
         // sanity check enrichLocationData
         const enrichLocationData = parameters.enrichLocationData || UserFlux.ufLocationEnrichmentEnabled;
         if (typeof enrichLocationData !== 'boolean') {
-            console.error('Invalid enrichLocationData passed to track method');
+            console.info('Invalid enrichLocationData passed to track method');
             return;
         }
 
         const enrichPageProperties = parameters.enrichPageProperties || false;
         if (typeof enrichPageProperties !== 'boolean') {
-            console.error('Invalid enrichPageProperties passed to track method');
+            console.info('Invalid enrichPageProperties passed to track method');
             return;
         }
 
         const enrichReferrerProperties = parameters.enrichReferrerProperties || false;
         if (typeof enrichReferrerProperties !== 'boolean') {
-            console.error('Invalid enrichReferrerProperties passed to track method');
+            console.info('Invalid enrichReferrerProperties passed to track method');
             return;
         }
 
         const enrichUTMProperties = parameters.enrichUTMProperties || false;
         if (typeof enrichUTMProperties !== 'boolean') {
-            console.error('Invalid enrichUTMProperties passed to track method');
+            console.info('Invalid enrichUTMProperties passed to track method');
             return;
         }
 
         // sanity check addToQueue
         const addToQueue = parameters.addToQueue || false;
         if (typeof addToQueue !== 'boolean') {
-            console.error('Invalid addToQueue passed to track method');
+            console.info('Invalid addToQueue passed to track method');
             return;
         }
 
@@ -438,7 +438,7 @@ class UserFlux {
 
     static async flushEvents(queue, eventType) {
         if (!UserFlux.isApiKeyProvided()) {
-            console.error('API key not provided. Cannot flush events.');
+            console.info('API key not provided. Cannot flush events.');
             return;
         }
 
@@ -453,7 +453,7 @@ class UserFlux {
 
     static async sendRequest(endpoint, data, locationEnrich = UserFlux.ufLocationEnrichmentEnabled) {
         if (!UserFlux.isApiKeyProvided()) {
-            console.error('API key not provided. Cannot send request.');
+            console.info('API key not provided. Cannot send request.');
             return;
         }
 
@@ -468,7 +468,7 @@ class UserFlux {
                 keepalive: true
             });
         } catch (error) {
-            console.error('UF Error: ', error);
+            console.info('UF Error: ', error);
         }
     }
 
@@ -486,7 +486,7 @@ class UserFlux {
                 pageTitle: document.title
             };
         } catch (e) {
-            console.error('Error on getPageProperties:', error)
+            console.info('Error on getPageProperties:', error)
             return {};
         }
     }
@@ -561,7 +561,7 @@ class UserFlux {
                 browserHeight: window.innerHeight
             };
         } catch (error) {
-            console.error('Error:', error)
+            console.info('Error:', error)
             return null;
         }
     }
@@ -589,7 +589,7 @@ class UserFlux {
 
             return queryParams;
         } catch (error) {
-            console.error('Error: ', error)
+            console.info('Error: ', error)
             return null;
         }
     }
@@ -606,7 +606,7 @@ class UserFlux {
                 referrerHost: document.referrer ? new URL(document.referrer).hostname : null,
             }
         } catch (error) {
-            console.error('Error: ', error)
+            console.info('Error: ', error)
             return null;
         }
     }
@@ -634,7 +634,7 @@ class UserFlux {
         
             document.cookie = name + "=" + (value || "")  + expires + sameSite + secure + domain + "; path=/";
         } catch (error) {
-            console.error('Error:', error)
+            console.info('Error:', error)
         }
     }
 
@@ -650,7 +650,7 @@ class UserFlux {
             }
             return null;
         } catch (error) {
-            console.error('Error:', error)
+            console.info('Error:', error)
             return null;
         }
     }
@@ -665,7 +665,7 @@ class UserFlux {
 
             document.cookie = name+'=; Max-Age=-99999999; path=/' + '; domain=.' + domain;
         } catch (error) {
-            console.error('Error:', error);
+            console.info('Error:', error);
         }
     }
 
