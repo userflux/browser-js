@@ -30,7 +30,7 @@ The `initialize` method takes two arguments:
         - `clicks` - Capture clicks
         - `all` - Capture all of the above events
     - `allowCookies` - A boolean indicating whether or not to allow cookies. Defaults to `true`
-    - `autoEnrich` - A boolean indicating whether or not to automatically enrich events with additional information such as location and device properties. Defaults to `true`
+    - `autoEnrich` - A boolean indicating whether or not to automatically enrich events with location and device properties. Defaults to `true`
     - `defaultTrackingProperties` - An object containing any default properties to be sent with every event. Defaults to an empty object
 
 ## 3. Tracking events
@@ -45,6 +45,7 @@ await UserFlux.track({
     enrichPageProperties: true,
     enrichReferrerProperties: true,
     enrichUTMProperties: true,
+    enrichPaidAdProperties: true,
     addToQueue: true
 })
 ```
@@ -56,9 +57,10 @@ The `track` method takes a single argument:
     - `userId` - (optional) A string representing the user ID of the user you're identifying with attributes
     - `enrichDeviceData` - (optional) A boolean indicating whether or not to enrich the event with device data. Defaults to the value of `autoEnrich` in the global options
     - `enrichLocationData` - (optional) A boolean indicating whether or not to enrich the event with location data. Defaults to the value of `autoEnrich` in the global options
-    - `enrichPageProperties` - (optional) A boolean indicating whether or not to enrich the event with page properties. Defaults to `false`
-    - `enrichReferrerProperties` - (optional) A boolean indicating whether or not to enrich the event with referrer properties. Defaults to `false`
-    - `enrichUTMProperties` - (optional) A boolean indicating whether or not to enrich the event with UTM properties. Defaults to `false`
+    - `enrichPageProperties` - (optional) A boolean indicating whether or not to enrich the event with page properties. Defaults to `true`
+    - `enrichReferrerProperties` - (optional) A boolean indicating whether or not to enrich the event with referrer properties. Defaults to `true`
+    - `enrichUTMProperties` - (optional) A boolean indicating whether or not to enrich the event with UTM properties. Defaults to `true`
+    - `enrichPaidAdProperties` - (optional) A boolean indicating whether or not to enrich the event with paid advertisement properties (such as google and facebook ads). Defaults to `true`
     - `addToQueue` - (optional) A boolean indicating whether or not to add the event to the queue. Defaults to `false`. If `false`, the event will be sent immediately
 
 ## 4. Identifying users
@@ -93,7 +95,8 @@ await UserFlux.trackBatch([
         enrichLocationData: true,
         enrichPageProperties: true,
         enrichReferrerProperties: true,
-        enrichUTMProperties: true
+        enrichUTMProperties: true,
+        enrichPaidAdProperties: true
     },
     {
         event: 'event_name',
@@ -103,7 +106,8 @@ await UserFlux.trackBatch([
         enrichLocationData: true,
         enrichPageProperties: true,
         enrichReferrerProperties: true,
-        enrichUTMProperties: true
+        enrichUTMProperties: true,
+        enrichPaidAdProperties: true
     }
 ])
 ```

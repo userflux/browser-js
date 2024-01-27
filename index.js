@@ -131,7 +131,8 @@ class UserFlux {
             properties: {
                 ...UserFlux.getPageProperties(),
                 ...UserFlux.getReferrerProperties() || {},
-                ...UserFlux.getUTMProperties() || {}
+                ...UserFlux.getUTMProperties() || {},
+                ...UserFlux.getPaidAdProperties() || {}
             },
             addToQueue: true
         });
@@ -374,21 +375,27 @@ class UserFlux {
             return;
         }
 
-        const enrichPageProperties = parameters.enrichPageProperties || false;
+        const enrichPageProperties = parameters.enrichPageProperties || true;
         if (typeof enrichPageProperties !== 'boolean') {
             console.info('Invalid enrichPageProperties passed to track method');
             return;
         }
 
-        const enrichReferrerProperties = parameters.enrichReferrerProperties || false;
+        const enrichReferrerProperties = parameters.enrichReferrerProperties || true;
         if (typeof enrichReferrerProperties !== 'boolean') {
             console.info('Invalid enrichReferrerProperties passed to track method');
             return;
         }
 
-        const enrichUTMProperties = parameters.enrichUTMProperties || false;
+        const enrichUTMProperties = parameters.enrichUTMProperties || true;
         if (typeof enrichUTMProperties !== 'boolean') {
             console.info('Invalid enrichUTMProperties passed to track method');
+            return;
+        }
+
+        const enrichPaidAdProperties = parameters.enrichPaidAdProperties || true;
+        if (typeof enrichPaidAdProperties !== 'boolean') {
+            console.info('Invalid enrichPaidAdProperties passed to track method');
             return;
         }
 
@@ -405,7 +412,8 @@ class UserFlux {
             ...UserFlux.ufDefaultTrackingProperties,
             ...enrichPageProperties ? UserFlux.getPageProperties() : {},
             ...enrichReferrerProperties ? UserFlux.getReferrerProperties() : {},
-            ...enrichUTMProperties ? UserFlux.getUTMProperties() : {}
+            ...enrichUTMProperties ? UserFlux.getUTMProperties() : {},
+            ...enrichPaidAdProperties ? UserFlux.getPaidAdProperties() : {}
         };
 
         const payload = {
@@ -600,6 +608,30 @@ class UserFlux {
                 utmContent: urlSearchParams.get('utm_content') || null,
                 utmId: urlSearchParams.get('utm_id') || null,
                 utmSourcePlatform: urlSearchParams.get('utm_source_platform') || null
+            };
+
+            return queryParams;
+        } catch (error) {
+            console.info('Error: ', error)
+            return null;
+        }
+    }
+
+    static getPaidAdProperties() {
+        try {
+            // Check if running in a browser environment
+            if (typeof window === 'undefined') {
+                return null;
+            }
+
+            let locationHref = window.location.href;
+
+            // Extract query parameters
+            const urlSearchParams = new URLSearchParams(new URL(locationHref).search);
+            let queryParams = {
+                gclid: urlSearchParams.get('gclid') || null,
+                fbclid: urlSearchParams.get('fbclid') || null,
+                msclkid: urlSearchParams.get('msclkid') || null
             };
 
             return queryParams;
