@@ -6,6 +6,8 @@ class UserFlux {
     static ufUserId = null;
     static ufTrackQueue = [];
     static ufAnonymousId = '';
+    static ufSessionIdEnabled = true;
+    static ufSessionId = null;
     static ufAllowCookies = false;
     static ufLocationEnrichmentEnabled = true;
     static ufDeviceDataEnrichmentEnabled = true;
@@ -22,6 +24,12 @@ class UserFlux {
             UserFlux.ufAnonymousId = UserFlux.getOrCreateAnonymousId();
             UserFlux.ufUserId = UserFlux.getUserId();
             UserFlux.ufTrackQueue = UserFlux.loadEventsFromStorage();
+
+            if ('trackSession' in options && options['trackSession'] == false) {
+                UserFlux.ufSessionIdEnabled = false;
+            } else {
+                UserFlux.setupSessionId();
+            }
 
             if ('autoEnrich' in options && options['autoEnrich'] == false) {
                 UserFlux.ufLocationEnrichmentEnabled = false;
@@ -67,7 +75,9 @@ class UserFlux {
             },
             getItem: (key) => {
                 try {
-                    return (UserFlux.isLocalStorageAccessible() ? localStorage.getItem(key) : null) || ((UserFlux.ufAllowCookies == true) ? UserFlux.getCookie(key) : null);
+                    return (UserFlux.isLocalStorageAccessible() ? localStorage.getItem(key) : null) 
+                        || ((UserFlux.ufAllowCookies == true) ? UserFlux.getCookie(key) 
+                        : null);
                 } catch (error) {
                     console.info('Error getting item from storage: ', error);
                     return null;
@@ -82,6 +92,35 @@ class UserFlux {
                 }
             }
         };
+    }
+
+    static setupSessionId() {
+        if (!UserFlux.isSessionStorageAccessible()) {
+            console.info('Session storage is not accessible. Session ID handling will be disabled.');
+            UserFlux.clearSessionId();
+            return;
+        }
+
+        const currentSessionId = UserFlux.getSessionId();
+        
+        if (UserFlux.isNullOrBlank(currentSessionId)) {
+            const newSessionId = UserFlux.generateUUID();
+            UserFlux.setSessionId(newSessionId);
+        } else {
+            return currentSessionId;
+        }
+    }
+
+    static setSessionId(newSessionId) {
+        sessionStorage.setItem('uf-sessionId', newSessionId);
+    }
+
+    static getSessionId() {
+
+    }
+
+    static clearSessionId() {
+        UserFlux.ufSessionId = null;
     }
 
     static setupAutoTracking(autoCaptureOptions) {
@@ -194,9 +233,9 @@ class UserFlux {
     }
 
     static getOrCreateAnonymousId() {
-        let anonymousId = (UserFlux.ufAnonymousId != '') ? UserFlux.ufAnonymousId : UserFlux.getStorage()?.getItem('uf-anonymousId');
+        var anonymousId = (UserFlux.ufAnonymousId != '') ? UserFlux.ufAnonymousId : UserFlux.getStorage()?.getItem('uf-anonymousId');
 
-        if (!anonymousId || anonymousId == null || anonymousId == undefined || anonymousId == '') {
+        if (UserFlux.isNullOrBlank(anonymousId)) {
             anonymousId = UserFlux.createNewAnonymousId();
             UserFlux.getStorage()?.setItem('uf-anonymousId', anonymousId);
         } else {
@@ -226,7 +265,9 @@ class UserFlux {
         
         // clean up any wrongly stored user ids
         let shouldForceUpdate = false;
-        if (userId == 'null' || userId == '' || userId == 'undefined') {
+        
+        // handle edge case values
+        if (UserFlux.isNullOrBlank(userId)) {
             userId = null;
             shouldForceUpdate = true;
         }
@@ -295,7 +336,7 @@ class UserFlux {
 
         // sanity check userId
         let userId = parameters.userId || UserFlux.ufUserId;
-        if (userId && (typeof userId !== 'string' || userId == 'null' || userId == '' || userId == 'undefined')) userId = null;
+        if (userId && (typeof userId !== 'string' || UserFlux.isNullOrBlank(userId))) userId = null;
         if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId);
 
         // sanity check properties
@@ -344,14 +385,14 @@ class UserFlux {
 
         // sanity check event
         const event = parameters.event;
-        if (!event || typeof event !== 'string' || event == 'null' || event == '' || event == 'undefined') {
+        if (!event || typeof event !== 'string' || UserFlux.isNullOrBlank(event)) {
             console.info('Invalid event passed to track method');
             return;
         }
 
         // sanity check userId
         let userId = parameters.userId || UserFlux.ufUserId;
-        if (userId && (typeof userId !== 'string' || userId == 'null' || userId == '' || userId == 'undefined')) userId = null;
+        if (userId && (typeof userId !== 'string' || UserFlux.isNullOrBlank(userId))) userId = null;
         if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId);
 
         // sanity check properties
@@ -740,6 +781,12 @@ class UserFlux {
             // Catch any errors, including security-related ones
             return false;
         }
+    }
+
+    // Method to check if a value is null or empty
+    // Handles edges cases where values retrieve from storage come back as string values instead of null
+    static isNullOrBlank(value) {
+        return value == null || value == undefined || value == '' || value == 'null' || value == 'undefined';
     }
 
 }
