@@ -303,19 +303,20 @@ class UserFlux {
     }
 
     static getOrCreateAnonymousId() {
-        let anonymousId = (UserFlux.ufAnonymousId != '') ? UserFlux.ufAnonymousId : UserFlux.getStorage()?.getItem('uf-anonymousId');
-
-        if (UserFlux.isStringNullOrBlank(anonymousId)) {
-            anonymousId = UserFlux.createNewAnonymousId();
-            UserFlux.getStorage()?.setItem('uf-anonymousId', anonymousId);
+        let anonymousId
+        if (UserFlux.isStringNullOrBlank(UserFlux.ufAnonymousId)) { // default value is '' which means it hasn't been set yet
+            // fetch from storage, if it isn't there then create a new ID
+            anonymousId = UserFlux.getStorage()?.getItem('uf-anonymousId') ?? UserFlux.createNewAnonymousId()
         } else {
-            // Update anonymousId in local storage to prevent it from expiring
-            UserFlux.getStorage()?.setItem('uf-anonymousId', anonymousId);
+            // otherwise value is set 
+            anonymousId = UserFlux.ufAnonymousId
         }
 
-        UserFlux.ufAnonymousId = anonymousId;
+        // Update anonymousId in memory + local + cookie storage to prevent it from expiring
+        UserFlux.ufAnonymousId = anonymousId
+        UserFlux.getStorage()?.setItem('uf-anonymousId', anonymousId)
 
-        return anonymousId;
+        return anonymousId
     }
 
     static createNewAnonymousId() {
