@@ -94,29 +94,97 @@ class UserFlux {
         };
     }
 
-    static setupSessionId() {
-        if (!UserFlux.isSessionStorageAccessible()) {
-            console.info('Session storage is not accessible. Session ID handling will be disabled.');
-            UserFlux.clearSessionId();
-            return;
+    static getSessionStorage() {
+        if (typeof window === 'undefined') {
+            return null;
         }
 
-        const currentSessionId = UserFlux.getSessionId();
-        
-        if (UserFlux.isNullOrBlank(currentSessionId)) {
-            const newSessionId = UserFlux.generateUUID();
-            UserFlux.setSessionId(newSessionId);
-        } else {
-            return currentSessionId;
+        return {
+            setItem: (key, value) => {
+                try {
+                    if (UserFlux.isSessionStorageAccessible()) sessionStorage.setItem(key, value);
+                } catch (error) {
+                    console.info('Error setting item to session storage: ', error);
+                }
+            },
+            getItem: (key) => {
+                try {
+                    return UserFlux.isSessionStorageAccessible() ? sessionStorage.getItem(key) : null;
+                } catch (error) {
+                    console.info('Error getting item from session storage: ', error);
+                    return null;
+                }
+            },
+            removeItem: (key) => {
+                try {
+                    if (UserFlux.isSessionStorageAccessible()) sessionStorage.removeItem(key);
+                } catch (error) {
+                    console.info('Error removing item from session storage: ', error);
+                }
+            }
+        };
+    }
+
+    static setupSessionId() {
+        try {
+            if (!UserFlux.isSessionStorageAccessible()) {
+                console.info('Session storage is not accessible. Session ID handling will be disabled.');
+                UserFlux.clearSessionId();
+                return;
+            }
+
+            const currentSessionId = UserFlux.getSessionId();
+            
+            if (UserFlux.isStringNullOrBlank(currentSessionId)) {
+                const newSessionId = UserFlux.generateUUID();
+                UserFlux.setSessionId(newSessionId);
+            } else {
+                return currentSessionId;
+            }
+        } catch (error) {
+            console.info('Error setting up session ID: ', error);
         }
     }
 
     static setSessionId(newSessionId) {
-        sessionStorage.setItem('uf-sessionId', newSessionId);
+        if (!UserFlux.isSessionStorageAccessible()) {
+            return;
+        }
+
+        try {
+            UserFlux.ufSessionId = newSessionId;
+            UserFlux.getSessionStorage()?.setItem('uf-sessionId', newSessionId);
+        } catch (error) {
+            console.info('Error setting session ID: ', error);
+        }
     }
 
     static getSessionId() {
+        if (!UserFlux.isSessionStorageAccessible()) {
+            return null;
+        }
 
+        // fetch from memory
+        if (!UserFlux.isStringNullOrBlank(UserFlux.ufSessionId)) {
+            return UserFlux.ufSessionId;
+        }
+
+        // fetch from sesionStorage
+        const idFromSessionStorage = UserFlux.getSessionStorage()?.getItem('uf-sessionId');
+        if (!UserFlux.isStringNullOrBlank(idFromSessionStorage)) {
+            UserFlux.setSessionId(idFromSessionStorage);
+            return idFromSessionStorage;
+        }
+
+        // fetch from cookie
+        const idFromCookie = UserFlux.getCookie('uf-sessionId');
+        if (!UserFlux.isStringNullOrBlank(idFromCookie)) {
+            UserFlux.setSessionId(idFromCookie);
+            return idFromCookie;
+        }
+
+        // otherwise return null
+        return null;
     }
 
     static clearSessionId() {
@@ -235,7 +303,7 @@ class UserFlux {
     static getOrCreateAnonymousId() {
         var anonymousId = (UserFlux.ufAnonymousId != '') ? UserFlux.ufAnonymousId : UserFlux.getStorage()?.getItem('uf-anonymousId');
 
-        if (UserFlux.isNullOrBlank(anonymousId)) {
+        if (UserFlux.isStringNullOrBlank(anonymousId)) {
             anonymousId = UserFlux.createNewAnonymousId();
             UserFlux.getStorage()?.setItem('uf-anonymousId', anonymousId);
         } else {
@@ -267,7 +335,7 @@ class UserFlux {
         let shouldForceUpdate = false;
         
         // handle edge case values
-        if (UserFlux.isNullOrBlank(userId)) {
+        if (UserFlux.isStringNullOrBlank(userId)) {
             userId = null;
             shouldForceUpdate = true;
         }
@@ -336,7 +404,7 @@ class UserFlux {
 
         // sanity check userId
         let userId = parameters.userId || UserFlux.ufUserId;
-        if (userId && (typeof userId !== 'string' || UserFlux.isNullOrBlank(userId))) userId = null;
+        if (userId && (typeof userId !== 'string' || UserFlux.isStringNullOrBlank(userId))) userId = null;
         if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId);
 
         // sanity check properties
@@ -385,14 +453,14 @@ class UserFlux {
 
         // sanity check event
         const event = parameters.event;
-        if (!event || typeof event !== 'string' || UserFlux.isNullOrBlank(event)) {
+        if (!event || typeof event !== 'string' || UserFlux.isStringNullOrBlank(event)) {
             console.info('Invalid event passed to track method');
             return;
         }
 
         // sanity check userId
         let userId = parameters.userId || UserFlux.ufUserId;
-        if (userId && (typeof userId !== 'string' || UserFlux.isNullOrBlank(userId))) userId = null;
+        if (userId && (typeof userId !== 'string' || UserFlux.isStringNullOrBlank(userId))) userId = null;
         if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId);
 
         // sanity check properties
@@ -783,9 +851,10 @@ class UserFlux {
         }
     }
 
-    // Method to check if a value is null or empty
+    // Method to check if a strings value is null or empty
     // Handles edges cases where values retrieve from storage come back as string values instead of null
-    static isNullOrBlank(value) {
+    static isStringNullOrBlank(value) {
+        if (typeof value !== 'string') return false;
         return value == null || value == undefined || value == '' || value == 'null' || value == 'undefined';
     }
 
