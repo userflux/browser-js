@@ -728,6 +728,20 @@ class UserFlux {
         }
     }
 
+    // Method to check if sessionStorage is accessible
+    static isSessionStorageAccessible() {
+        try {
+            const storage = window.sessionStorage;
+            const testKey = 'uf-ss-test';
+            storage.setItem(testKey, 'test');
+            storage.removeItem(testKey);
+            return true;
+        } catch (e) {
+            // Catch any errors, including security-related ones
+            return false;
+        }
+    }
+
 }
 
 module.exports = UserFlux;
