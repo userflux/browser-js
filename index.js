@@ -6,7 +6,6 @@ class UserFlux {
     static ufUserId = null;
     static ufTrackQueue = [];
     static ufAnonymousId = '';
-    static ufSessionIdEnabled = true;
     static ufSessionId = null;
     static ufAllowCookies = false;
     static ufLocationEnrichmentEnabled = true;
@@ -25,9 +24,7 @@ class UserFlux {
             UserFlux.ufUserId = UserFlux.getUserId();
             UserFlux.ufTrackQueue = UserFlux.loadEventsFromStorage();
 
-            if ('trackSession' in options && options['trackSession'] == false) {
-                UserFlux.ufSessionIdEnabled = false;
-            } else {
+            if ('trackSession' in options && options['trackSession'] == true) {
                 UserFlux.setupSessionId();
             }
 
@@ -95,21 +92,21 @@ class UserFlux {
     }
 
     static getSessionStorage() {
-        if (typeof window === 'undefined') {
+        if (typeof window === 'undefined' || !UserFlux.isSessionStorageAccessible()) {
             return null;
         }
 
         return {
             setItem: (key, value) => {
                 try {
-                    if (UserFlux.isSessionStorageAccessible()) sessionStorage.setItem(key, value);
+                    sessionStorage.setItem(key, value);
                 } catch (error) {
                     console.info('Error setting item to session storage: ', error);
                 }
             },
             getItem: (key) => {
                 try {
-                    return UserFlux.isSessionStorageAccessible() ? sessionStorage.getItem(key) : null;
+                    return sessionStorage.getItem(key);
                 } catch (error) {
                     console.info('Error getting item from session storage: ', error);
                     return null;
@@ -117,7 +114,7 @@ class UserFlux {
             },
             removeItem: (key) => {
                 try {
-                    if (UserFlux.isSessionStorageAccessible()) sessionStorage.removeItem(key);
+                    sessionStorage.removeItem(key);
                 } catch (error) {
                     console.info('Error removing item from session storage: ', error);
                 }
@@ -138,8 +135,6 @@ class UserFlux {
             if (UserFlux.isStringNullOrBlank(currentSessionId)) {
                 const newSessionId = UserFlux.generateUUID();
                 UserFlux.setSessionId(newSessionId);
-            } else {
-                return currentSessionId;
             }
         } catch (error) {
             console.info('Error setting up session ID: ', error);
@@ -301,7 +296,7 @@ class UserFlux {
     }
 
     static getOrCreateAnonymousId() {
-        var anonymousId = (UserFlux.ufAnonymousId != '') ? UserFlux.ufAnonymousId : UserFlux.getStorage()?.getItem('uf-anonymousId');
+        let anonymousId = (UserFlux.ufAnonymousId != '') ? UserFlux.ufAnonymousId : UserFlux.getStorage()?.getItem('uf-anonymousId');
 
         if (UserFlux.isStringNullOrBlank(anonymousId)) {
             anonymousId = UserFlux.createNewAnonymousId();
@@ -322,7 +317,7 @@ class UserFlux {
 
     static generateUUID() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = (Math.random() * 16) | 0,
+            let r = (Math.random() * 16) | 0,
                 v = c == 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
@@ -518,6 +513,7 @@ class UserFlux {
         // combine event properties with any default tracking properties
         const finalProperties = {
             ...properties,
+            sessionId: UserFlux.getSessionId(),
             ...UserFlux.ufDefaultTrackingProperties,
             ...enrichPageProperties ? UserFlux.getPageProperties() : {},
             ...enrichReferrerProperties ? UserFlux.getReferrerProperties() : {},
@@ -774,7 +770,7 @@ class UserFlux {
             
             if (days) {
                 const date = new Date();
-                date.setTime(date.getTime() + (days*24*60*60*1000));
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
                 expires = "; expires=" + date.toUTCString();
             }
 
@@ -825,6 +821,7 @@ class UserFlux {
         }
     }
 
+    // Method to check if localStorage is accessible
     static isLocalStorageAccessible() {
         try {
             // Try to use localStorage
