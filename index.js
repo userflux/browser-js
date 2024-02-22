@@ -858,8 +858,8 @@ class UserFlux {
     // Method to check if a strings value is null or empty
     // Handles edges cases where values retrieve from storage come back as string values instead of null
     static isStringNullOrBlank(value) {
-        if (typeof value !== 'string') return false;
-        return value == null || value == undefined || value == '' || value == 'null' || value == 'undefined';
+        if (typeof value !== 'string') return true;
+        return !value || value == null || value == undefined || value == '' || value == 'null' || value == 'undefined';
     }
 
 }
