@@ -149,6 +149,7 @@ class UserFlux {
         try {
             UserFlux.ufSessionId = newSessionId;
             UserFlux.getSessionStorage()?.setItem('uf-sessionId', newSessionId);
+            UserFlux.setCookie('uf-sessionId', newSessionId, 0.003); // 5 minutes in days
         } catch (error) {
             console.info('Error setting session ID: ', error);
         }
@@ -161,20 +162,21 @@ class UserFlux {
 
         // fetch from memory
         if (!UserFlux.isStringNullOrBlank(UserFlux.ufSessionId)) {
+            UserFlux.setSessionId(UserFlux.ufSessionId); // replenish storage
             return UserFlux.ufSessionId;
         }
 
         // fetch from sesionStorage
         const idFromSessionStorage = UserFlux.getSessionStorage()?.getItem('uf-sessionId');
         if (!UserFlux.isStringNullOrBlank(idFromSessionStorage)) {
-            UserFlux.setSessionId(idFromSessionStorage);
+            UserFlux.setSessionId(idFromSessionStorage); // replenish storage
             return idFromSessionStorage;
         }
 
         // fetch from cookie
         const idFromCookie = UserFlux.getCookie('uf-sessionId');
         if (!UserFlux.isStringNullOrBlank(idFromCookie)) {
-            UserFlux.setSessionId(idFromCookie);
+            UserFlux.setSessionId(idFromCookie); // replenish storage
             return idFromCookie;
         }
 
