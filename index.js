@@ -521,7 +521,6 @@ class UserFlux {
         // combine event properties with any default tracking properties
         const finalProperties = {
             ...properties,
-            sessionId: UserFlux.getSessionId(),
             ...UserFlux.ufDefaultTrackingProperties,
             ...enrichPageProperties ? UserFlux.getPageProperties() : {},
             ...enrichReferrerProperties ? UserFlux.getReferrerProperties() : {},
@@ -533,6 +532,7 @@ class UserFlux {
             timestamp: Date.now(),
             userId: userId,
             anonymousId: UserFlux.getOrCreateAnonymousId(),
+            sessionId: UserFlux.getSessionId(),
             name: event,
             properties: finalProperties,
             deviceData: enrichDeviceData ? UserFlux.getDeviceProperties() : null
