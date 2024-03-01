@@ -615,12 +615,12 @@ class UserFlux {
                 return {};
             }
 
-            return {
+            return UserFlux.removeNullProperties({
                 host: window.location.host,
                 href: window.location.href,
                 path: window.location.pathname,
                 pageTitle: document.title
-            };
+            });
         } catch (e) {
             console.info('Error on getPageProperties:', error)
             return {};
@@ -685,7 +685,7 @@ class UserFlux {
                 os = 'Unknown';
             }
 
-            return {
+            return UserFlux.removeNullProperties({
                 userAgent: userAgent,
                 browser: browser,
                 browserVersion: browserVersion,
@@ -695,7 +695,7 @@ class UserFlux {
                 screenHeight: window.screen.height,
                 browserWidth: window.innerWidth,
                 browserHeight: window.innerHeight
-            };
+            });
         } catch (error) {
             console.info('Error:', error)
             return null;
@@ -723,7 +723,7 @@ class UserFlux {
                 utmSourcePlatform: urlSearchParams.get('utm_source_platform') || null
             };
 
-            return queryParams;
+            return UserFlux.removeNullProperties(queryParams);
         } catch (error) {
             console.info('Error: ', error)
             return null;
@@ -747,7 +747,7 @@ class UserFlux {
                 msclkid: urlSearchParams.get('msclkid') || null
             };
 
-            return queryParams;
+            return UserFlux.removeNullProperties(queryParams);
         } catch (error) {
             console.info('Error: ', error)
             return null;
@@ -761,10 +761,10 @@ class UserFlux {
                 return null;
             }
 
-            return {
+            return UserFlux.removeNullProperties({
                 referrerHref: (document.referrer !== '') ? document.referrer : null,
                 referrerHost: document.referrer ? new URL(document.referrer).hostname : null,
-            }
+            })
         } catch (error) {
             console.info('Error: ', error)
             return null;
@@ -861,6 +861,12 @@ class UserFlux {
     static isStringNullOrBlank(value) {
         if (typeof value !== 'string') return true;
         return !value || value == null || value == undefined || value == '' || value == 'null' || value == 'undefined';
+    }
+
+    // Method to remove null properties from an object
+    // Used for cleaning up the properties object of a event before tracking
+    static removeNullProperties(object) {
+        return Object.fromEntries(Object.entries(object).filter(([key, value]) => value !== null));
     }
 
 }
