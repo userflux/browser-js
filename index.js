@@ -11,6 +11,7 @@ class UserFlux {
     static ufLocationEnrichmentEnabled = true;
     static ufDeviceDataEnrichmentEnabled = true;
     static ufDefaultTrackingProperties = {};
+    static ufCustomQueryParamsToCollect = [];
 
     static initialize(apiKey, options) {
         try {
@@ -35,6 +36,10 @@ class UserFlux {
 
             if ('defaultTrackingProperties' in options && typeof options['defaultTrackingProperties'] === 'object') {
                 UserFlux.ufDefaultTrackingProperties = options['defaultTrackingProperties'];
+            }
+
+            if ('customQueryParamsToCollect' in options && Array.isArray(options['customQueryParamsToCollect']) === true) {
+                UserFlux.ufCustomQueryParamsToCollect = options['customQueryParamsToCollect'];
             }
 
             UserFlux.startFlushInterval();
@@ -525,7 +530,8 @@ class UserFlux {
             ...enrichPageProperties ? UserFlux.getPageProperties() : {},
             ...enrichReferrerProperties ? UserFlux.getReferrerProperties() : {},
             ...enrichUTMProperties ? UserFlux.getUTMProperties() : {},
-            ...enrichPaidAdProperties ? UserFlux.getPaidAdProperties() : {}
+            ...enrichPaidAdProperties ? UserFlux.getPaidAdProperties() : {},
+            ...UserFlux.getCustomQueryParamProperties() || {}
         };
 
         const payload = {
@@ -702,6 +708,33 @@ class UserFlux {
         }
     }
 
+    static getCustomQueryParamProperties() {
+        try {
+            // Check if there are any custom query parameters to collect
+            if (UserFlux.ufCustomQueryParamsToCollect.length == 0) return null;
+
+            // Check if running in a browser environment
+            if (typeof window === 'undefined') {
+                return null;
+            }
+
+            // Pickup any custom query parameters from the href, default to null if it doesn't exist
+            let locationHref = window.location.href;
+            const urlSearchParams = new URLSearchParams(new URL(locationHref).search);
+
+            let customQueryParams = {};
+            UserFlux.ufCustomQueryParamsToCollect.forEach((param) => {
+                customQueryParams[param] = urlSearchParams.get(param) || null;
+            });
+
+            // Remove any null properties from the object before returning
+            return UserFlux.removeNullProperties(customQueryParams);
+        } catch (error) {
+            console.info('Error for getCustomQueryParamProperties(): ', error)
+            return null;
+        }
+    }
+
     static getUTMProperties() {
         try {
             // Check if running in a browser environment
@@ -725,7 +758,7 @@ class UserFlux {
 
             return UserFlux.removeNullProperties(queryParams);
         } catch (error) {
-            console.info('Error: ', error)
+            console.info('Error for getUTMProperties(): ', error)
             return null;
         }
     }
@@ -749,7 +782,7 @@ class UserFlux {
 
             return UserFlux.removeNullProperties(queryParams);
         } catch (error) {
-            console.info('Error: ', error)
+            console.info('Error for getPaidAdProperties(): ', error)
             return null;
         }
     }
@@ -766,7 +799,7 @@ class UserFlux {
                 referrerHost: document.referrer ? new URL(document.referrer).hostname : null,
             })
         } catch (error) {
-            console.info('Error: ', error)
+            console.info('Error getReferrerProperties(): ', error)
             return null;
         }
     }

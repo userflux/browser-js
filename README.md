@@ -33,6 +33,7 @@ The `initialize` method takes two arguments:
     - `autoEnrich` - A boolean indicating whether or not to automatically enrich events with location and device properties. Defaults to `true`
     - `defaultTrackingProperties` - An object containing any default properties to be sent with every event. Defaults to an empty object
     - `trackSession` - A boolean indicating whether or not to track sessions with an unique identifier. Defaults to `false`
+    - `customQueryParamsToCollect` - An array of strings used to define which custom query parameters to auto collect and include in event properties. Defaults to none.
 
 ## 3. Tracking events
 
