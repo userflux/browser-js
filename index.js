@@ -25,7 +25,9 @@ class UserFlux {
             UserFlux.ufUserId = UserFlux.getUserId();
             UserFlux.ufTrackQueue = UserFlux.loadEventsFromStorage();
 
-            if ('trackSession' in options && options['trackSession'] == true) {
+            if ('trackSession' in options && options['trackSession'] == false) {
+                // don't setup session id
+            } else {
                 UserFlux.setupSessionId();
             }
 

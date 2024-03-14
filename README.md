@@ -16,8 +16,9 @@ import UserFlux from '@userflux/browser-js'
 UserFlux.initialize('<YOUR_WRITE_KEY>', { 
     autoCapture: ['page_views', 'page_leaves', 'clicks'], 
     allowCookies: true, 
-    autoEnrich: true, 
-    defaultTrackingProperties: { ... } 
+    autoEnrich: true,
+    defaultTrackingProperties: { ... },
+    trackSession: true
 })
 ```
 
@@ -32,7 +33,7 @@ The `initialize` method takes two arguments:
     - `allowCookies` - A boolean indicating whether or not to allow cookies. Defaults to `true`
     - `autoEnrich` - A boolean indicating whether or not to automatically enrich events with location and device properties. Defaults to `true`
     - `defaultTrackingProperties` - An object containing any default properties to be sent with every event. Defaults to an empty object
-    - `trackSession` - A boolean indicating whether or not to track sessions with an unique identifier. Defaults to `false`
+    - `trackSession` - A boolean indicating whether or not to track sessions with an unique identifier. Defaults to `true`
     - `customQueryParamsToCollect` - An array of strings used to define which custom query parameters to auto collect and include in event properties. Defaults to none.
 
 ## 3. Tracking events
