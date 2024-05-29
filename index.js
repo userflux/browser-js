@@ -817,17 +817,16 @@ class UserFlux {
                 expires = "; expires=" + date.toUTCString();
             }
 
-            // Set SameSite to Lax
-            const sameSite = "; SameSite=Lax";
-            // Lax is compatible with both secure and non-secure sites, but using Secure when available is better
-            const secure = window.location.protocol === 'https:' ? "; Secure" : "";
+            // Set SameSite to Strict
+            const sameSite = "; SameSite=Strict";
+            //const secure = window.location.protocol === 'https:' ? "; Secure" : "";
 
             // Dynamically determine the base domain
             const hostMatchRegex = /[a-z0-9][a-z0-9-]+\.[a-z]{2,}$/i
             const matches = document.location.hostname.match(hostMatchRegex);
             const domain = matches ? '; domain=.' + matches[0] : '';
         
-            document.cookie = name + "=" + (value || "")  + expires + sameSite + secure + domain + "; path=/";
+            document.cookie = name + "=" + (value || "")  + expires + sameSite + "; Secure" + domain + "; path=/";
         } catch (error) {
             console.info('Error:', error)
         }
