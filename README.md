@@ -35,6 +35,7 @@ The `initialize` method takes two arguments:
     - `defaultTrackingProperties` - An object containing any default properties to be sent with every event. Defaults to an empty object
     - `trackSession` - A boolean indicating whether or not to track sessions with an unique identifier. Defaults to `true`
     - `customQueryParamsToCollect` - An array of strings used to define which custom query parameters to auto collect and include in event properties. Defaults to none.
+    - `disableUserIdStorage` - A boolean indicating whether or not to store the provided user id in storage. Defaults to `false`
 
 ## 3. Tracking events
 

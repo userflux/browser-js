@@ -12,6 +12,7 @@ class UserFlux {
     static ufDeviceDataEnrichmentEnabled = true;
     static ufDefaultTrackingProperties = {};
     static ufCustomQueryParamsToCollect = [];
+    static disableUserIdStorage = false;
 
     static initialize(apiKey, options) {
         try {
@@ -19,6 +20,10 @@ class UserFlux {
 
             if ('allowCookies' in options && options['allowCookies'] == true) {
                 UserFlux.ufAllowCookies = true;
+            }
+
+            if ('disableUserIdStorage' in options && options['disableUserIdStorage'] == true) {
+                UserFlux.disableUserIdStorage = true;
             }
 
             UserFlux.ufAnonymousId = UserFlux.getOrCreateAnonymousId();
@@ -49,6 +54,10 @@ class UserFlux {
             if ('autoCapture' in options) {
                 UserFlux.setupAutoTracking(options['autoCapture']);
             }
+
+            if (UserFlux.disableUserIdStorage == true && UserFlux.ufUserId != null) {
+                UserFlux.getStorage()?.removeItem('uf-userId');
+            }
         } catch (error) {
             console.info('Failed to initialize UserFlux SDK: ', error);
         }
@@ -71,7 +80,8 @@ class UserFlux {
         return {
             setItem: (key, value) => {
                 try {
-                    if (UserFlux.isLocalStorageAccessible()) localStorage.setItem(key, value);
+                    let shouldSkipForLocalStorage = UserFlux.disableUserIdStorage == true && key === 'uf-userId';
+                    if (!shouldSkipForLocalStorage && UserFlux.isLocalStorageAccessible()) localStorage.setItem(key, value);
                     let expiryDays = key === 'uf-userId' ? 30 : 365;
                     if (UserFlux.ufAllowCookies == true) UserFlux.setCookie(key, value, expiryDays);
                 } catch (error) {
