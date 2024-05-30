@@ -72,7 +72,8 @@ class UserFlux {
             setItem: (key, value) => {
                 try {
                     if (UserFlux.isLocalStorageAccessible()) localStorage.setItem(key, value);
-                    if (UserFlux.ufAllowCookies == true) UserFlux.setCookie(key, value, 365);
+                    let expiryDays = key === 'uf-userId' ? 30 : 365;
+                    if (UserFlux.ufAllowCookies == true) UserFlux.setCookie(key, value, expiryDays);
                 } catch (error) {
                     console.info('Error setting item to storage: ', error);
                 }
