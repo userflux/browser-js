@@ -12,7 +12,7 @@ class UserFlux {
     static ufDeviceDataEnrichmentEnabled = true;
     static ufDefaultTrackingProperties = {};
     static ufCustomQueryParamsToCollect = [];
-    static disableUserIdStorage = false;
+    static ufDisableUserIdStorage = false;
 
     static initialize(apiKey, options) {
         try {
@@ -23,7 +23,7 @@ class UserFlux {
             }
 
             if ('disableUserIdStorage' in options && options['disableUserIdStorage'] == true) {
-                UserFlux.disableUserIdStorage = true;
+                UserFlux.ufDisableUserIdStorage = true;
             }
 
             UserFlux.ufAnonymousId = UserFlux.getOrCreateAnonymousId();
@@ -55,7 +55,7 @@ class UserFlux {
                 UserFlux.setupAutoTracking(options['autoCapture']);
             }
 
-            if (UserFlux.disableUserIdStorage == true && UserFlux.ufUserId != null) {
+            if (UserFlux.ufDisableUserIdStorage == true && UserFlux.ufUserId != null) {
                 UserFlux.getStorage()?.removeItem('uf-userId');
             }
         } catch (error) {
@@ -80,7 +80,7 @@ class UserFlux {
         return {
             setItem: (key, value) => {
                 try {
-                    let shouldSkipForLocalStorage = UserFlux.disableUserIdStorage == true && key === 'uf-userId';
+                    let shouldSkipForLocalStorage = UserFlux.ufDisableUserIdStorage == true && key === 'uf-userId';
                     if (!shouldSkipForLocalStorage && UserFlux.isLocalStorageAccessible()) localStorage.setItem(key, value);
                     let expiryDays = key === 'uf-userId' ? 30 : 365;
                     if (UserFlux.ufAllowCookies == true) UserFlux.setCookie(key, value, expiryDays);
