@@ -834,7 +834,7 @@ class UserFlux {
             }
 
             // Set SameSite setting
-            const sameSite = `; SameSite=${UserFlux.ufCookieSameSiteSetting}"`;
+            const sameSite = `; SameSite=${UserFlux.ufCookieSameSiteSetting}`;
 
             // Dynamically determine the base domain
             const hostMatchRegex = /[a-z0-9][a-z0-9-]+\.[a-z]{2,}$/i
