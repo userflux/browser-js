@@ -31,6 +31,7 @@ The `initialize` method takes two arguments:
         - `clicks` - Capture clicks
         - `all` - Capture all of the above events
     - `allowCookies` - A boolean indicating whether or not to allow cookies. Defaults to `true`
+    - `cookieSameSiteSetting` - A string indicating what cookie same site setting to use. Defaults to `Strict`. Options available are: `Strict`, `Lax`
     - `autoEnrich` - A boolean indicating whether or not to automatically enrich events with location and device properties. Defaults to `true`
     - `defaultTrackingProperties` - An object containing any default properties to be sent with every event. Defaults to an empty object
     - `trackSession` - A boolean indicating whether or not to track sessions with an unique identifier. Defaults to `true`

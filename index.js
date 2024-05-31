@@ -8,6 +8,7 @@ class UserFlux {
     static ufAnonymousId = '';
     static ufSessionId = null;
     static ufAllowCookies = false;
+    static ufCookieSameSiteSetting = 'Strict';
     static ufLocationEnrichmentEnabled = true;
     static ufDeviceDataEnrichmentEnabled = true;
     static ufDefaultTrackingProperties = {};
@@ -20,6 +21,10 @@ class UserFlux {
 
             if ('allowCookies' in options && options['allowCookies'] == true) {
                 UserFlux.ufAllowCookies = true;
+            }
+
+            if ('cookieSameSiteSetting' in options && options['cookieSameSiteSetting'] == 'Lax') {
+                UserFlux.ufCookieSameSiteSetting = 'Lax';
             }
 
             if ('disableUserIdStorage' in options && options['disableUserIdStorage'] == true) {
@@ -828,9 +833,8 @@ class UserFlux {
                 expires = "; expires=" + date.toUTCString();
             }
 
-            // Set SameSite to Strict
-            const sameSite = "; SameSite=Strict";
-            //const secure = window.location.protocol === 'https:' ? "; Secure" : "";
+            // Set SameSite setting
+            const sameSite = `; SameSite=${UserFlux.ufCookieSameSiteSetting}"`;
 
             // Dynamically determine the base domain
             const hostMatchRegex = /[a-z0-9][a-z0-9-]+\.[a-z]{2,}$/i
