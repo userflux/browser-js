@@ -87,8 +87,11 @@ class UserFlux {
                 try {
                     let shouldSkipForLocalStorage = UserFlux.ufDisableUserIdStorage == true && key === 'uf-userId';
                     if (!shouldSkipForLocalStorage && UserFlux.isLocalStorageAccessible()) localStorage.setItem(key, value);
+
                     let expiryDays = key === 'uf-userId' ? 30 : 365;
-                    if (UserFlux.ufAllowCookies == true) UserFlux.setCookie(key, value, expiryDays);
+
+                    let shouldSkipForCookieStorage = (key == 'uf-track')
+                    if (UserFlux.ufAllowCookies == true && !shouldSkipForCookieStorage) UserFlux.setCookie(key, value, expiryDays);
                 } catch (error) {
                     console.info('Error setting item to storage: ', error);
                 }
