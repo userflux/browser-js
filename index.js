@@ -14,6 +14,7 @@ class UserFlux {
     static ufDefaultTrackingProperties = {};
     static ufCustomQueryParamsToCollect = [];
     static ufDisableUserIdStorage = false;
+    static ufCookieExpiryDays = 365;
 
     static initialize(apiKey, options) {
         try {
@@ -25,6 +26,10 @@ class UserFlux {
 
             if ('cookieSameSiteSetting' in options && options['cookieSameSiteSetting'] == 'Lax') {
                 UserFlux.ufCookieSameSiteSetting = 'Lax';
+            }
+
+            if ('cookieExpiryDays' in options && typeof options['cookieExpiryDays'] === 'number') {
+                UserFlux.ufCookieExpiryDays = options['cookieExpiryDays'];
             }
 
             if ('disableUserIdStorage' in options && options['disableUserIdStorage'] == true) {
@@ -88,10 +93,8 @@ class UserFlux {
                     let shouldSkipForLocalStorage = UserFlux.ufDisableUserIdStorage == true && key === 'uf-userId';
                     if (!shouldSkipForLocalStorage && UserFlux.isLocalStorageAccessible()) localStorage.setItem(key, value);
 
-                    let expiryDays = key === 'uf-userId' ? 30 : 365;
-
                     let shouldSkipForCookieStorage = (key == 'uf-track')
-                    if (UserFlux.ufAllowCookies == true && !shouldSkipForCookieStorage) UserFlux.setCookie(key, value, expiryDays);
+                    if (UserFlux.ufAllowCookies == true && !shouldSkipForCookieStorage) UserFlux.setCookie(key, value, UserFlux.ufCookieExpiryDays);
                 } catch (error) {
                     console.info('Error setting item to storage: ', error);
                 }
