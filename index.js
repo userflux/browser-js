@@ -272,7 +272,7 @@ class UserFlux {
                 ...UserFlux.getUTMProperties() || {},
                 ...UserFlux.getPaidAdProperties() || {}
             },
-            addToQueue: true
+            addToQueue: false
         });
     }
 
@@ -313,7 +313,7 @@ class UserFlux {
             properties: {
                 ...filteredProperties
             },
-            addToQueue: true
+            addToQueue: false
         });
     }
 
@@ -323,7 +323,7 @@ class UserFlux {
             properties: {
                 ...UserFlux.getPageProperties()
             },
-            addToQueue: true
+            addToQueue: false
         });
     }
 
