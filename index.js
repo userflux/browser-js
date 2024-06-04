@@ -843,11 +843,12 @@ class UserFlux {
             const sameSite = `; SameSite=${UserFlux.ufCookieSameSiteSetting}`;
 
             // Dynamically determine the base domain
-            const hostMatchRegex = /[a-z0-9][a-z0-9-]+\.[a-z]{2,}$/i
+            const hostMatchRegex = /^(?:https?:\/\/)?(?:[^\/]+\.)?([^.\/]+\.(?:co\.uk|com\.au|com|co|money|io|is)).*$/i;
             const matches = document.location.hostname.match(hostMatchRegex);
-            const domain = matches ? '; domain=.' + matches[0] : '';
+            const domain = matches ? matches[1] : '';
+            const cookieDomain = domain ? '; domain=.' + domain : '';
         
-            document.cookie = name + "=" + (value || "")  + expires + sameSite + "; Secure" + domain + "; path=/";
+            document.cookie = name + "=" + (value || "")  + expires + sameSite + "; Secure" + cookieDomain + "; path=/";
         } catch (error) {
             console.info('Error:', error)
         }
