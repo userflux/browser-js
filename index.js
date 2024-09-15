@@ -974,6 +974,9 @@ class UserFlux {
 			"semrushbot",
 			"ahrefsbot",
 			"monotybot",
+			"amazon-qbusiness",
+			"google-safety",
+			"amazon-kendra",
 		]
 
 		// Check for bot keywords
