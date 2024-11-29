@@ -729,6 +729,10 @@ class UserFlux {
 				os = "Unknown"
 			}
 
+			// Determine Browser Language Preference
+			const browserLanguage =
+				navigator.language || navigator.userLanguage || navigator.browserLanguage || "Unknown"
+
 			return UserFlux.removeNullProperties({
 				userAgent: userAgent,
 				browser: browser,
@@ -739,6 +743,7 @@ class UserFlux {
 				screenHeight: window.screen.height,
 				browserWidth: window.innerWidth,
 				browserHeight: window.innerHeight,
+				browserLanguage: browserLanguage,
 			})
 		} catch (error) {
 			console.info("Error:", error)
