@@ -259,8 +259,8 @@ class UserFlux {
 			return
 		}
 
-		window.addEventListener("pageshow", (event) => {
-			UserFlux.trackPageView()
+		window.addEventListener("pageshow", async (event) => {
+			await UserFlux.trackPageView()
 		})
 	}
 
@@ -270,8 +270,9 @@ class UserFlux {
 			return
 		}
 
-		window.addEventListener("pagehide", (event) => {
-			UserFlux.trackPageLeave()
+		// TBD: what's best to use pagehide or beforeunload
+		window.addEventListener("pagehide", async (event) => {
+			await UserFlux.trackPageLeave()
 		})
 	}
 
@@ -294,17 +295,17 @@ class UserFlux {
 			return
 		}
 
-		document.addEventListener("click", (event) => {
+		document.addEventListener("click", async (event) => {
 			const element = event.target.closest('a, button, input[type="submit"], input[type="button"]')
 
 			// If the clicked element or its parent is not what we want to track, return early.
 			if (!element) return
 
-			UserFlux.trackClick(element)
+			await UserFlux.trackClick(element)
 		})
 	}
 
-	static trackClick(element) {
+	static async trackClick(element) {
 		const properties = {
 			elementTagName: element.tagName,
 			elementInnerText:
@@ -321,7 +322,7 @@ class UserFlux {
 			return obj
 		}, {})
 
-		UserFlux.track({
+		await UserFlux.track({
 			event: "click",
 			properties: {
 				...filteredProperties,
@@ -330,11 +331,14 @@ class UserFlux {
 		})
 	}
 
-	static trackPageLeave() {
-		UserFlux.track({
+	static async trackPageLeave() {
+		await UserFlux.track({
 			event: "page_leave",
 			properties: {
 				...UserFlux.getPageProperties(),
+				...(UserFlux.getReferrerProperties() || {}),
+				...(UserFlux.getUTMProperties() || {}),
+				...(UserFlux.getPaidAdProperties() || {}),
 			},
 			addToQueue: false,
 		})
@@ -582,15 +586,11 @@ class UserFlux {
 			deviceData: enrichDeviceData ? UserFlux.getDeviceProperties() : null,
 		}
 
-		if (addToQueue) {
-			const shouldForceFlush = UserFlux.getStorage() == null
-			UserFlux.ufTrackQueue.push(payload)
-			UserFlux.saveEventsToStorage("uf-track", UserFlux.ufTrackQueue)
-			await UserFlux.checkQueue(UserFlux.ufTrackQueue, "event/ingest/batch", shouldForceFlush)
-			return null
-		} else {
-			return await UserFlux.sendRequest("event/ingest/batch", { events: [payload] }, enrichLocationData)
-		}
+		const shouldForceFlush = UserFlux.getStorage() == null || addToQueue == false
+		UserFlux.ufTrackQueue.push(payload)
+		UserFlux.saveEventsToStorage("uf-track", UserFlux.ufTrackQueue)
+		await UserFlux.checkQueue(UserFlux.ufTrackQueue, "event/ingest/batch", shouldForceFlush)
+		return null
 	}
 
 	static async trackBatch(events) {
