@@ -270,6 +270,7 @@ class UserFlux {
 			return
 		}
 
+		// TBD: what's best to use pagehide or beforeunload
 		window.addEventListener("pagehide", async (event) => {
 			await UserFlux.trackPageLeave()
 		})
@@ -585,15 +586,11 @@ class UserFlux {
 			deviceData: enrichDeviceData ? UserFlux.getDeviceProperties() : null,
 		}
 
-		if (addToQueue) {
-			const shouldForceFlush = UserFlux.getStorage() == null
-			UserFlux.ufTrackQueue.push(payload)
-			UserFlux.saveEventsToStorage("uf-track", UserFlux.ufTrackQueue)
-			await UserFlux.checkQueue(UserFlux.ufTrackQueue, "event/ingest/batch", shouldForceFlush)
-			return null
-		} else {
-			return await UserFlux.sendRequest("event/ingest/batch", { events: [payload] }, enrichLocationData)
-		}
+		const shouldForceFlush = UserFlux.getStorage() == null || addToQueue == false
+		UserFlux.ufTrackQueue.push(payload)
+		UserFlux.saveEventsToStorage("uf-track", UserFlux.ufTrackQueue)
+		await UserFlux.checkQueue(UserFlux.ufTrackQueue, "event/ingest/batch", shouldForceFlush)
+		return null
 	}
 
 	static async trackBatch(events) {
