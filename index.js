@@ -259,8 +259,8 @@ class UserFlux {
 			return
 		}
 
-		window.addEventListener("pageshow", (event) => {
-			UserFlux.trackPageView()
+		window.addEventListener("pageshow", async (event) => {
+			await UserFlux.trackPageView()
 		})
 	}
 
@@ -270,8 +270,8 @@ class UserFlux {
 			return
 		}
 
-		window.addEventListener("pagehide", (event) => {
-			UserFlux.trackPageLeave()
+		window.addEventListener("pagehide", async (event) => {
+			await UserFlux.trackPageLeave()
 		})
 	}
 
@@ -294,17 +294,17 @@ class UserFlux {
 			return
 		}
 
-		document.addEventListener("click", (event) => {
+		document.addEventListener("click", async (event) => {
 			const element = event.target.closest('a, button, input[type="submit"], input[type="button"]')
 
 			// If the clicked element or its parent is not what we want to track, return early.
 			if (!element) return
 
-			UserFlux.trackClick(element)
+			await UserFlux.trackClick(element)
 		})
 	}
 
-	static trackClick(element) {
+	static async trackClick(element) {
 		const properties = {
 			elementTagName: element.tagName,
 			elementInnerText:
@@ -321,7 +321,7 @@ class UserFlux {
 			return obj
 		}, {})
 
-		UserFlux.track({
+		await UserFlux.track({
 			event: "click",
 			properties: {
 				...filteredProperties,
@@ -330,11 +330,14 @@ class UserFlux {
 		})
 	}
 
-	static trackPageLeave() {
-		UserFlux.track({
+	static async trackPageLeave() {
+		await UserFlux.track({
 			event: "page_leave",
 			properties: {
 				...UserFlux.getPageProperties(),
+				...(UserFlux.getReferrerProperties() || {}),
+				...(UserFlux.getUTMProperties() || {}),
+				...(UserFlux.getPaidAdProperties() || {}),
 			},
 			addToQueue: false,
 		})
