@@ -327,7 +327,7 @@ class UserFlux {
 			properties: {
 				...filteredProperties,
 			},
-			addToQueue: false,
+			addToQueue: true,
 		})
 	}
 
@@ -340,7 +340,7 @@ class UserFlux {
 				...(UserFlux.getUTMProperties() || {}),
 				...(UserFlux.getPaidAdProperties() || {}),
 			},
-			addToQueue: false,
+			addToQueue: true,
 		})
 	}
 
@@ -628,7 +628,8 @@ class UserFlux {
 			UserFlux.saveEventsToStorage(`uf-track`, queue)
 		} else {
 			// If the request fails, add the events back to the queue
-			UserFlux.saveEventsToStorage(`uf-track`, queue.push(...eventsToTrack))
+			queue.push(...eventsToTrack)
+			UserFlux.saveEventsToStorage(`uf-track`, queue)
 		}
 
 		// If the queue is not empty, check it again
