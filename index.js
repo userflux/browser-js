@@ -622,8 +622,14 @@ class UserFlux {
 			return
 		}
 
-		await UserFlux.sendRequest(eventType, { events: queue.splice(0, 10) })
-		UserFlux.saveEventsToStorage(`uf-track`, queue)
+		const eventsToTrack = queue.splice(0, 10)
+		const success = await UserFlux.sendRequest(eventType, { events: eventsToTrack })
+		if (success) {
+			UserFlux.saveEventsToStorage(`uf-track`, queue)
+		} else {
+			// If the request fails, add the events back to the queue
+			UserFlux.saveEventsToStorage(`uf-track`, queue.push(...eventsToTrack))
+		}
 
 		// If the queue is not empty, check it again
 		if (queue.length > 0) {
@@ -634,11 +640,11 @@ class UserFlux {
 	static async sendRequest(endpoint, data, locationEnrich = UserFlux.ufLocationEnrichmentEnabled) {
 		if (!UserFlux.isApiKeyProvided()) {
 			console.info("API key not provided. Cannot send request.")
-			return
+			return false
 		}
 
 		try {
-			return await fetch(`https://integration-api.userflux.co/${endpoint}?locationEnrichment=${locationEnrich}`, {
+			await fetch(`https://integration-api.userflux.co/${endpoint}?locationEnrichment=${locationEnrich}`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -647,8 +653,11 @@ class UserFlux {
 				body: JSON.stringify(data),
 				keepalive: true,
 			})
+
+			return true
 		} catch (error) {
 			console.info("UF Error: ", error)
+			return false
 		}
 	}
 
