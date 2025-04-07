@@ -846,7 +846,7 @@ class UserFlux {
 
 			let locationHref = window.location.href
 			const urlSearchParams = new URLSearchParams(new URL(locationHref).search)
-			return urlSearchParams.get("uf_eid") || null
+			return urlSearchParams.get("ufeid") || null
 		} catch (error) {
 			console.info("Error for getExternalIdQueryParam(): ", error)
 			return null
