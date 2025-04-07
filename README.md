@@ -65,6 +65,7 @@ The `track` method takes a single argument:
     -   `event` - (required) A string representing the name of the event
     -   `properties` - (optional) An object containing any properties to be sent with the event. Defaults to an empty object. Any `defaultTrackingProperties` provided in the global options will be merged with these properties
     -   `userId` - (optional) A string representing the user ID of the user you're identifying with attributes
+    -   `externalId` - (optional) A string representing the external ID of the user you're identifying with attributes
     -   `enrichDeviceData` - (optional) A boolean indicating whether or not to enrich the event with device data. Defaults to the value of `autoEnrich` in the global options
     -   `enrichLocationData` - (optional) A boolean indicating whether or not to enrich the event with location data. Defaults to the value of `autoEnrich` in the global options
     -   `enrichPageProperties` - (optional) A boolean indicating whether or not to enrich the event with page properties. Defaults to `true`
@@ -89,6 +90,7 @@ The `identify` method takes a single argument:
 -   `parameters` - An object containing the following properties:
     -   `properties` - (required) An object containing any attributes to be associated with the users profile
     -   `userId` - (optional) A string representing the user ID of the user you're identifying with attributes
+    -   `externalId` - (optional) A string representing the external ID of the user you're identifying with attributes
     -   `enrichDeviceData` - (optional) A boolean indicating whether or not to enrich the event with device data. Defaults to the value of `autoEnrich` in the global options
     -   `enrichLocationData` - (optional) A boolean indicating whether or not to enrich the event with location data. Defaults to the value of `autoEnrich` in the global options
 
