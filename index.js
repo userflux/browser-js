@@ -15,6 +15,9 @@ class UserFlux {
 	static ufCustomQueryParamsToCollect = []
 	static ufDisableUserIdStorage = false
 	static ufCookieExpiryDays = 365
+	static ufConsecutiveFailures = 0
+	static ufMaxConsecutiveFailures = 3
+	static ufRetryDelay = 1000 // 1 second delay between retries
 
 	static initialize(apiKey, options) {
 		try {
@@ -643,25 +646,45 @@ class UserFlux {
 			return
 		}
 
+		// Check if we've hit the maximum consecutive failures
+		if (UserFlux.ufConsecutiveFailures >= UserFlux.ufMaxConsecutiveFailures) {
+			console.info(`UF: Max consecutive failures (${UserFlux.ufMaxConsecutiveFailures}) reached. Stopping flush attempts.`)
+			// Reset the failure counter after some time to allow retrying later
+			setTimeout(() => {
+				UserFlux.ufConsecutiveFailures = 0
+			}, 60000) // Reset after 1 minute
+			return
+		}
+
 		const eventsToTrack = queue.splice(0, 10)
 		const success = await UserFlux.sendRequest(eventType, { events: eventsToTrack })
 		if (success) {
 			UserFlux.saveEventsToStorage(`uf-track`, queue)
+			UserFlux.ufConsecutiveFailures = 0
 		} else {
 			// If the request fails, add the events back to the queue
 			queue.push(...eventsToTrack)
 			UserFlux.saveEventsToStorage(`uf-track`, queue)
+			UserFlux.ufConsecutiveFailures++
 		}
 
-		// If the queue is not empty, check it again
+		// If the queue is not empty, check it again with a delay
 		if (queue.length > 0) {
-			await UserFlux.checkQueue(queue, eventType, true)
+			setTimeout(async () => {
+				await UserFlux.checkQueue(queue, eventType, true)
+			}, UserFlux.ufRetryDelay)
 		}
 	}
 
 	static async sendRequest(endpoint, data, locationEnrich = UserFlux.ufLocationEnrichmentEnabled) {
 		if (!UserFlux.isApiKeyProvided()) {
 			console.info("API key not provided. Cannot send request.")
+			return false
+		}
+
+		// Check if we're in an iframe that might be closing/closed
+		if (typeof window !== 'undefined' && window.frameElement && !document.body) {
+			console.info("UF: Iframe appears to be closing/closed. Skipping request.")
 			return false
 		}
 
@@ -678,7 +701,7 @@ class UserFlux {
 
 			return true
 		} catch (error) {
-			console.info("UF Error: ", error)
+			console.info("UF HTTP Error: ", error)
 			return false
 		}
 	}
