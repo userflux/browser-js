@@ -437,15 +437,9 @@ class UserFlux {
 		// Firstly, flush any pending events
 		await UserFlux.checkQueue(UserFlux.ufTrackQueue, "event/ingest/batch", true)
 
-		// Clear all stored data
+		// Clear identified user stored data
 		UserFlux.ufUserId = null
 		UserFlux.getStorage()?.removeItem("uf-userId")
-
-		UserFlux.ufAnonymousId = null
-		UserFlux.getStorage()?.removeItem("uf-anonymousId")
-
-		UserFlux.ufAnonymousId = UserFlux.createNewAnonymousId()
-		UserFlux.getStorage()?.setItem("uf-anonymousId", UserFlux.ufAnonymousId)
 
 		UserFlux.ufExternalId = null
 		UserFlux.getStorage()?.removeItem("uf-externalId")
