@@ -115,10 +115,16 @@ class UserFlux {
 			},
 			getItem: (key) => {
 				try {
-					return (
-						(UserFlux.isLocalStorageAccessible() ? localStorage.getItem(key) : null) ||
-						(UserFlux.ufAllowCookies == true ? UserFlux.getCookie(key) : null)
-					)
+					// first try fetch from cookies
+					const cookieValue = (UserFlux.ufAllowCookies == true ? UserFlux.getCookie(key) : null)
+					if (cookieValue !== null && cookieValue !== "") return cookieValue
+
+					// then try fetch from localStorage
+					const localStorageValue = (UserFlux.isLocalStorageAccessible() ? localStorage.getItem(key) : null)
+					if (localStorageValue !== null && localStorageValue !== "") return localStorageValue
+
+					// if not found in cookies or localStorage, return null
+					return null
 				} catch (error) {
 					console.info("Error getting item from storage: ", error)
 					return null
@@ -126,8 +132,8 @@ class UserFlux {
 			},
 			removeItem: (key) => {
 				try {
-					if (UserFlux.isLocalStorageAccessible()) localStorage.removeItem(key)
 					if (UserFlux.ufAllowCookies == true) UserFlux.eraseCookie(key)
+					if (UserFlux.isLocalStorageAccessible()) localStorage.removeItem(key)
 				} catch (error) {
 					console.info("Error removing item from storage: ", error)
 				}
