@@ -932,7 +932,7 @@ class UserFlux {
 			const sameSite = `; SameSite=${UserFlux.ufCookieSameSiteSetting}`
 
 			// Dynamically determine the base domain
-			const hostMatchRegex = /^(?:https?:\/\/)?(?:[^\/]+\.)?([^.\/]+\.(?:co\.uk|com\.au|com|co|money|io|is|dev|app|ai|vc)).*$/i
+			const hostMatchRegex = /^(?:https?:\/\/)?(?:[^\/]+\.)?([^.\/]+\.(?:co\.uk|com\.au|com|co|money|io|is|dev|app|ai|vc|xyz|gg|net|me|health)).*$/i
 			const matches = document.location.hostname.match(hostMatchRegex)
 			const domain = matches ? matches[1] : ""
 			const cookieDomain = domain ? "; domain=." + domain : ""
