@@ -45,7 +45,12 @@ class UserFlux {
 				UserFlux.ufDisableUserIdStorage = true
 			}
 
-			UserFlux.ufAnonymousId = UserFlux.getOrCreateAnonymousId()
+			let anonymousIdOverride = null
+			if ("anonymousIdOverride" in options && typeof options["anonymousIdOverride"] === "string") {
+				anonymousIdOverride = options["anonymousIdOverride"]
+			}
+
+			UserFlux.ufAnonymousId = UserFlux.getOrCreateAnonymousId(anonymousIdOverride)
 			UserFlux.ufUserId = UserFlux.getUserId()
 			UserFlux.ufTrackQueue = UserFlux.loadEventsFromStorage()
 
@@ -358,7 +363,15 @@ class UserFlux {
 		return UserFlux.ufApiKey !== null
 	}
 
-	static getOrCreateAnonymousId() {
+	static getOrCreateAnonymousId(override) {
+		if (override) {
+			// Update anonymousId in memory + local + cookie storage to prevent it from expiring
+			UserFlux.ufAnonymousId = override
+			UserFlux.getStorage()?.setItem("uf-anonymousId", override)
+
+			return override
+		}
+
 		let anonymousId
 		if (UserFlux.isStringNullOrBlank(UserFlux.ufAnonymousId)) {
 			// default value is '' which means it hasn't been set yet

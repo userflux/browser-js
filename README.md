@@ -41,6 +41,7 @@ The `initialize` method takes two arguments:
     -   `customQueryParamsToCollect` - An array of strings used to define which custom query parameters to auto collect and include in event properties. Defaults to none.
     -   `disableUserIdStorage` - A boolean indicating whether or not to store the provided user id in storage. Defaults to `false`
     -   `blockCommonBots` - A boolean indicating whether or not to block common bots from being tracked. Defaults to `true`
+    -   `anonymousIdOverride` - A string value to be used as the anonymous id of the device the user is on.
 
 ## 3. Tracking events
 
