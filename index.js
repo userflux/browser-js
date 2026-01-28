@@ -296,9 +296,9 @@ class UserFlux {
 			event: "page_view",
 			properties: {
 				...UserFlux.getPageProperties(),
-				...(UserFlux.getReferrerProperties() || {}),
-				...(UserFlux.getUTMProperties() || {}),
-				...(UserFlux.getPaidAdProperties() || {}),
+				...(UserFlux.getReferrerProperties() ?? {}),
+				...(UserFlux.getUTMProperties() ?? {}),
+				...(UserFlux.getPaidAdProperties() ?? {}),
 			},
 			addToQueue: false,
 		})
@@ -351,9 +351,9 @@ class UserFlux {
 			event: "page_leave",
 			properties: {
 				...UserFlux.getPageProperties(),
-				...(UserFlux.getReferrerProperties() || {}),
-				...(UserFlux.getUTMProperties() || {}),
-				...(UserFlux.getPaidAdProperties() || {}),
+				...(UserFlux.getReferrerProperties() ?? {}),
+				...(UserFlux.getUTMProperties() ?? {}),
+				...(UserFlux.getPaidAdProperties() ?? {}),
 			},
 			addToQueue: true,
 		})
@@ -402,7 +402,7 @@ class UserFlux {
 	}
 
 	static getUserId() {
-		let userId = UserFlux.ufUserId || UserFlux.getStorage()?.getItem("uf-userId")
+		let userId = UserFlux.ufUserId ?? UserFlux.getStorage()?.getItem("uf-userId")
 
 		// clean up any wrongly stored user ids
 		let shouldForceUpdate = false
@@ -478,31 +478,31 @@ class UserFlux {
 		}
 
 		// sanity check userId
-		let userId = parameters.userId || UserFlux.ufUserId
+		let userId = parameters.userId ?? UserFlux.ufUserId
 		if (userId && (typeof userId !== "string" || UserFlux.isStringNullOrBlank(userId))) userId = null
 		if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId)
 
 		// sanity check externalId
-		let externalId = parameters.externalId || UserFlux.ufExternalId || UserFlux.getExternalIdQueryParam()
+		let externalId = parameters.externalId ?? UserFlux.ufExternalId ?? UserFlux.getExternalIdQueryParam()
 		if (externalId && (typeof externalId !== "string" || UserFlux.isStringNullOrBlank(externalId))) externalId = null
 		if (externalId !== UserFlux.ufExternalId) UserFlux.setExternalId(externalId)
 
 		// sanity check properties
-		const properties = parameters.properties || {}
+		const properties = parameters.properties ?? {}
 		if (typeof properties !== "object") {
 			console.info("Invalid properties passed to identify method")
 			return
 		}
 
 		// sanity check enrichDeviceData
-		const enrichDeviceData = parameters.enrichDeviceData || UserFlux.ufDeviceDataEnrichmentEnabled
+		const enrichDeviceData = parameters.enrichDeviceData ?? UserFlux.ufDeviceDataEnrichmentEnabled
 		if (typeof enrichDeviceData !== "boolean") {
 			console.info("Invalid enrichDeviceData passed to identify method")
 			return
 		}
 
 		// sanity check enrichLocationData
-		const enrichLocationData = parameters.enrichLocationData || UserFlux.ufLocationEnrichmentEnabled
+		const enrichLocationData = parameters.enrichLocationData ?? UserFlux.ufLocationEnrichmentEnabled
 		if (typeof enrichLocationData !== "boolean") {
 			console.info("Invalid enrichLocationData passed to identify method")
 			return
@@ -540,62 +540,62 @@ class UserFlux {
 		}
 
 		// sanity check userId
-		let userId = parameters.userId || UserFlux.ufUserId
+		let userId = parameters.userId ?? UserFlux.ufUserId
 		if (userId && (typeof userId !== "string" || UserFlux.isStringNullOrBlank(userId))) userId = null
 		if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId)
 
 		// sanity check externalId
-		let externalId = parameters.externalId || UserFlux.ufExternalId || UserFlux.getExternalIdQueryParam()
+		let externalId = parameters.externalId ?? UserFlux.ufExternalId ?? UserFlux.getExternalIdQueryParam()
 		if (externalId && (typeof externalId !== "string" || UserFlux.isStringNullOrBlank(externalId))) externalId = null
 		if (externalId !== UserFlux.ufExternalId) UserFlux.setExternalId(externalId)
 
 		// sanity check properties
-		const properties = parameters.properties || {}
+		const properties = parameters.properties ?? {}
 		if (typeof properties !== "object") {
 			console.info("Invalid properties passed to track method")
 			return
 		}
 
 		// sanity check enrichDeviceData
-		const enrichDeviceData = parameters.enrichDeviceData || UserFlux.ufDeviceDataEnrichmentEnabled
+		const enrichDeviceData = parameters.enrichDeviceData ?? UserFlux.ufDeviceDataEnrichmentEnabled
 		if (typeof enrichDeviceData !== "boolean") {
 			console.info("Invalid enrichDeviceData passed to track method")
 			return
 		}
 
 		// sanity check enrichLocationData
-		const enrichLocationData = parameters.enrichLocationData || UserFlux.ufLocationEnrichmentEnabled
+		const enrichLocationData = parameters.enrichLocationData ?? UserFlux.ufLocationEnrichmentEnabled
 		if (typeof enrichLocationData !== "boolean") {
 			console.info("Invalid enrichLocationData passed to track method")
 			return
 		}
 
-		const enrichPageProperties = parameters.enrichPageProperties || true
+		const enrichPageProperties = parameters.enrichPageProperties ?? true
 		if (typeof enrichPageProperties !== "boolean") {
 			console.info("Invalid enrichPageProperties passed to track method")
 			return
 		}
 
-		const enrichReferrerProperties = parameters.enrichReferrerProperties || true
+		const enrichReferrerProperties = parameters.enrichReferrerProperties ?? true
 		if (typeof enrichReferrerProperties !== "boolean") {
 			console.info("Invalid enrichReferrerProperties passed to track method")
 			return
 		}
 
-		const enrichUTMProperties = parameters.enrichUTMProperties || true
+		const enrichUTMProperties = parameters.enrichUTMProperties ?? true
 		if (typeof enrichUTMProperties !== "boolean") {
 			console.info("Invalid enrichUTMProperties passed to track method")
 			return
 		}
 
-		const enrichPaidAdProperties = parameters.enrichPaidAdProperties || true
+		const enrichPaidAdProperties = parameters.enrichPaidAdProperties ?? true
 		if (typeof enrichPaidAdProperties !== "boolean") {
 			console.info("Invalid enrichPaidAdProperties passed to track method")
 			return
 		}
 
 		// sanity check addToQueue
-		const addToQueue = parameters.addToQueue || false
+		const addToQueue = parameters.addToQueue ?? false
 		if (typeof addToQueue !== "boolean") {
 			console.info("Invalid addToQueue passed to track method")
 			return
@@ -882,7 +882,7 @@ class UserFlux {
 
 			let locationHref = window.location.href
 			const urlSearchParams = new URLSearchParams(new URL(locationHref).search)
-			return urlSearchParams.get("ufeid") || null
+			return urlSearchParams.get("ufeid") ?? null
 		} catch (error) {
 			console.info("Error for getExternalIdQueryParam(): ", error)
 			return null
@@ -901,9 +901,9 @@ class UserFlux {
 			// Extract query parameters
 			const urlSearchParams = new URLSearchParams(new URL(locationHref).search)
 			let queryParams = {
-				gclid: urlSearchParams.get("gclid") || null,
-				fbclid: urlSearchParams.get("fbclid") || null,
-				msclkid: urlSearchParams.get("msclkid") || null,
+				gclid: urlSearchParams.get("gclid") ?? null,
+				fbclid: urlSearchParams.get("fbclid") ?? null,
+				msclkid: urlSearchParams.get("msclkid") ?? null,
 			}
 
 			return UserFlux.removeNullProperties(queryParams)
@@ -950,7 +950,7 @@ class UserFlux {
 			const domain = matches ? matches[1] : ""
 			const cookieDomain = domain ? "; domain=." + domain : ""
 
-			document.cookie = name + "=" + (value || "") + expires + sameSite + "; Secure" + cookieDomain + "; path=/"
+			document.cookie = name + "=" + (value ?? "") + expires + sameSite + "; Secure" + cookieDomain + "; path=/"
 		} catch (error) {
 			console.info("Error:", error)
 		}
