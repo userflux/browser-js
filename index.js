@@ -402,7 +402,7 @@ class UserFlux {
 	}
 
 	static getUserId() {
-		let userId = UserFlux.ufUserId ?? UserFlux.getStorage()?.getItem("uf-userId")
+		let userId = UserFlux.ufUserId || UserFlux.getStorage()?.getItem("uf-userId")
 
 		// clean up any wrongly stored user ids
 		let shouldForceUpdate = false
@@ -478,12 +478,12 @@ class UserFlux {
 		}
 
 		// sanity check userId
-		let userId = parameters.userId ?? UserFlux.ufUserId
+		let userId = parameters.userId || UserFlux.ufUserId
 		if (userId && (typeof userId !== "string" || UserFlux.isStringNullOrBlank(userId))) userId = null
 		if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId)
 
 		// sanity check externalId
-		let externalId = parameters.externalId ?? UserFlux.ufExternalId ?? UserFlux.getExternalIdQueryParam()
+		let externalId = parameters.externalId || UserFlux.ufExternalId || UserFlux.getExternalIdQueryParam()
 		if (externalId && (typeof externalId !== "string" || UserFlux.isStringNullOrBlank(externalId))) externalId = null
 		if (externalId !== UserFlux.ufExternalId) UserFlux.setExternalId(externalId)
 
@@ -540,12 +540,12 @@ class UserFlux {
 		}
 
 		// sanity check userId
-		let userId = parameters.userId ?? UserFlux.ufUserId
+		let userId = parameters.userId || UserFlux.ufUserId
 		if (userId && (typeof userId !== "string" || UserFlux.isStringNullOrBlank(userId))) userId = null
 		if (userId !== UserFlux.ufUserId) UserFlux.setUserId(userId)
 
 		// sanity check externalId
-		let externalId = parameters.externalId ?? UserFlux.ufExternalId ?? UserFlux.getExternalIdQueryParam()
+		let externalId = parameters.externalId || UserFlux.ufExternalId || UserFlux.getExternalIdQueryParam()
 		if (externalId && (typeof externalId !== "string" || UserFlux.isStringNullOrBlank(externalId))) externalId = null
 		if (externalId !== UserFlux.ufExternalId) UserFlux.setExternalId(externalId)
 
@@ -882,7 +882,7 @@ class UserFlux {
 
 			let locationHref = window.location.href
 			const urlSearchParams = new URLSearchParams(new URL(locationHref).search)
-			return urlSearchParams.get("ufeid") ?? null
+			return urlSearchParams.get("ufeid") || null
 		} catch (error) {
 			console.info("Error for getExternalIdQueryParam(): ", error)
 			return null
@@ -901,9 +901,9 @@ class UserFlux {
 			// Extract query parameters
 			const urlSearchParams = new URLSearchParams(new URL(locationHref).search)
 			let queryParams = {
-				gclid: urlSearchParams.get("gclid") ?? null,
-				fbclid: urlSearchParams.get("fbclid") ?? null,
-				msclkid: urlSearchParams.get("msclkid") ?? null,
+				gclid: urlSearchParams.get("gclid") || null,
+				fbclid: urlSearchParams.get("fbclid") || null,
+				msclkid: urlSearchParams.get("msclkid") || null,
 			}
 
 			return UserFlux.removeNullProperties(queryParams)
