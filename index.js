@@ -484,7 +484,7 @@ class UserFlux {
 
 		// sanity check externalId
 		let externalId = parameters.externalId ?? UserFlux.ufExternalId ?? UserFlux.getExternalIdQueryParam()
-		if (externalId && (typeof externalId !== "string" || UserFlux.isStringNullOrBlank(externalId))) externalId = null
+		if (externalId != null && (typeof externalId !== "string" || UserFlux.isStringNullOrBlank(externalId))) externalId = null
 		if (externalId !== UserFlux.ufExternalId) UserFlux.setExternalId(externalId)
 
 		// sanity check properties
@@ -546,7 +546,7 @@ class UserFlux {
 
 		// sanity check externalId
 		let externalId = parameters.externalId ?? UserFlux.ufExternalId ?? UserFlux.getExternalIdQueryParam()
-		if (externalId && (typeof externalId !== "string" || UserFlux.isStringNullOrBlank(externalId))) externalId = null
+		if (externalId != null && (typeof externalId !== "string" || UserFlux.isStringNullOrBlank(externalId))) externalId = null
 		if (externalId !== UserFlux.ufExternalId) UserFlux.setExternalId(externalId)
 
 		// sanity check properties
@@ -834,7 +834,7 @@ class UserFlux {
 
 			let customQueryParams = {}
 			UserFlux.ufCustomQueryParamsToCollect.forEach((param) => {
-				customQueryParams[param] = urlSearchParams.get(param) || null
+				customQueryParams[param] = urlSearchParams.get(param) ?? null
 			})
 
 			// Remove any null properties from the object before returning
@@ -857,13 +857,13 @@ class UserFlux {
 			// Extract query parameters
 			const urlSearchParams = new URLSearchParams(new URL(locationHref).search)
 			let queryParams = {
-				utmSource: urlSearchParams.get("utm_source") || null,
-				utmMedium: urlSearchParams.get("utm_medium") || null,
-				utmCampaign: urlSearchParams.get("utm_campaign") || null,
-				utmTerm: urlSearchParams.get("utm_term") || null,
-				utmContent: urlSearchParams.get("utm_content") || null,
-				utmId: urlSearchParams.get("utm_id") || null,
-				utmSourcePlatform: urlSearchParams.get("utm_source_platform") || null,
+				utmSource: urlSearchParams.get("utm_source") ?? null,
+				utmMedium: urlSearchParams.get("utm_medium") ?? null,
+				utmCampaign: urlSearchParams.get("utm_campaign") ?? null,
+				utmTerm: urlSearchParams.get("utm_term") ?? null,
+				utmContent: urlSearchParams.get("utm_content") ?? null,
+				utmId: urlSearchParams.get("utm_id") ?? null,
+				utmSourcePlatform: urlSearchParams.get("utm_source_platform") ?? null,
 			}
 
 			return UserFlux.removeNullProperties(queryParams)
