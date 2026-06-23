@@ -19,6 +19,7 @@ class UserFlux {
 	static ufMaxConsecutiveFailures = 3
 	static ufRetryDelay = 1000 // 1 second delay between retries
 	static ufEndpoint = "https://integration-api.userflux.co"
+	static ufPathOverrides = {}
 
 	static initialize(apiKey, options) {
 		try {
@@ -32,6 +33,18 @@ class UserFlux {
 
 			if ("endpoint" in options && typeof options["endpoint"] === "string") {
 				UserFlux.ufEndpoint = options["endpoint"]
+				if (!/^https?:\/\//i.test(UserFlux.ufEndpoint)) {
+					console.info("UF: endpoint should include a scheme e.g. https:// — requests may resolve relative to the current page.")
+				}
+			}
+
+			if (
+				"pathOverride" in options &&
+				typeof options["pathOverride"] === "object" &&
+				options["pathOverride"] !== null &&
+				!Array.isArray(options["pathOverride"])
+			) {
+				UserFlux.ufPathOverrides = options["pathOverride"]
 			}
 
 			if ("allowCookies" in options && options["allowCookies"] == true) {
@@ -707,7 +720,15 @@ class UserFlux {
 		}
 
 		try {
-			await fetch(`${UserFlux.ufEndpoint}/${endpoint}?locationEnrichment=${locationEnrich}`, {
+			// `endpoint` here is the request path/subroute. Allow it to be remapped via
+			// pathOverride (e.g. for first-party proxies masking analytics paths), falling
+			// back to the canonical path when no valid override is provided.
+			const override = UserFlux.ufPathOverrides[endpoint]
+			const resolvedPath = UserFlux.isStringNullOrBlank(override) ? endpoint : override
+			const base = UserFlux.ufEndpoint.replace(/\/+$/, "")
+			const path = resolvedPath.replace(/^\/+/, "")
+
+			await fetch(`${base}/${path}?locationEnrichment=${locationEnrich}`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",

@@ -42,7 +42,8 @@ The `initialize` method takes two arguments:
     - `disableUserIdStorage` - A boolean indicating whether or not to store the provided user id in storage. Defaults to `false`
     - `blockCommonBots` - A boolean indicating whether or not to block common bots from being tracked. Defaults to `true`
     - `anonymousIdOverride` - A string value to be used as the anonymous id of the device the user is on.
-    - `endpoint` - A string value used as the base path for sending events to, useful in case you need to proxy events through a server. Defaults to `https://integration-api.userflux.co`.
+    - `endpoint` - A string value used as the base path for sending events to, useful in case you need to proxy events through a server. Must include the scheme (e.g. `https://`) — a value without one will be resolved relative to the current page. Defaults to `https://integration-api.userflux.co`.
+    - `pathOverride` - An object used to remap the request path (subroute) for one or more routes, useful when proxying events and you also need to mask the path (e.g. to avoid path-based ad/privacy blocking). Keys are the canonical UserFlux paths and values are the path you want the SDK to send to instead. The two overridable routes are `event/ingest/batch` (events) and `profile` (identify). Defaults to no overrides. For example, with `endpoint: 'https://events.example.com'` and `pathOverride: { 'event/ingest/batch': 'h/a', 'profile': 'h/b' }`, events are sent to `https://events.example.com/h/a?locationEnrichment=...`. Your proxy must forward the request (including the `locationEnrichment` query string) to the matching UserFlux path.
 
 ## 3. Tracking events
 
