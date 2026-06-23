@@ -18,6 +18,7 @@ class UserFlux {
 	static ufConsecutiveFailures = 0
 	static ufMaxConsecutiveFailures = 3
 	static ufRetryDelay = 1000 // 1 second delay between retries
+	static ufEndpoint = "https://integration-api.userflux.co"
 
 	static initialize(apiKey, options) {
 		try {
@@ -28,6 +29,10 @@ class UserFlux {
 			}
 
 			UserFlux.ufApiKey = apiKey
+
+			if ("endpoint" in options && typeof options["endpoint"] === "string") {
+				UserFlux.ufEndpoint = options["endpoint"]
+			}
 
 			if ("allowCookies" in options && options["allowCookies"] == true) {
 				UserFlux.ufAllowCookies = true
@@ -702,7 +707,7 @@ class UserFlux {
 		}
 
 		try {
-			await fetch(`https://integration-api.userflux.co/${endpoint}?locationEnrichment=${locationEnrich}`, {
+			await fetch(`${UserFlux.ufEndpoint}/${endpoint}?locationEnrichment=${locationEnrich}`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
